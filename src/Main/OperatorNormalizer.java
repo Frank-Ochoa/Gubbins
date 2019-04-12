@@ -43,6 +43,11 @@ public class OperatorNormalizer implements IASTExprOperatorVisitor
 		ret(new NLessThan(left(), right()));
 	}
 
+	@Override public void visit(GreaterThan a)
+	{
+		ret(new NGreaterThan(left(), right()));
+	}
+
 	@Override public void visit(Mult a)
 	{
 		ret(new NMult(left(), right()));

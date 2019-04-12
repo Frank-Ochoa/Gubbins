@@ -13,6 +13,7 @@ public interface INExprVisitor
 	void visit(NDiv a);
 	void visit(NSub a);
 	void visit(NLessThan a);
+	void visit(NGreaterThan a);
 	void visit(Promote a);
 	void visit(NOR a);
 }

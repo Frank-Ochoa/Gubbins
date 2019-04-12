@@ -433,6 +433,7 @@ IASTExpr ConditionalExpression() :
     result = AdditiveExpression()
     (
         <LESS_THAN> b = AdditiveExpression() {result = new LessThan(result, b);}
+        | <GREATER_THAN> b = AdditiveExpression() {result = new GreaterThan(result, b);}
         // And can do other conditionals under this if need be
     )*/*@bgen(jjtree)*/
     {

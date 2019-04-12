@@ -194,6 +194,22 @@ public class ExpressionEvaluator implements INExprVisitor
 		}
 	}
 
+	@Override public void visit(NGreaterThan a)
+	{
+		Object left = eval(a.getLeft());
+
+		Object right = eval(a.getRight());
+
+		if (a.getLeft().getType() == NTypeInt.INT)
+		{
+			operand.push(((Integer) left > ((Integer) right)));
+		}
+		else
+		{
+			operand.push(((Double) left > ((Double) right)));
+		}
+	}
+
 	@Override public void visit(Promote a)
 	{
 		Integer promoted = ((Integer) eval(a.getNode()));

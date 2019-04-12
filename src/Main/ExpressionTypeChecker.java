@@ -193,6 +193,11 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		normalizeExprOperator(a);
 	}
 
+	@Override public void visit(GreaterThan a)
+	{
+		normalizeExprOperator(a);
+	}
+
 	private void normalizeExprOperator(IASTExprOperator operator)
 	{
 		INExpr l = tcheck(operator.getLeft());

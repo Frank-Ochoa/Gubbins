@@ -25,4 +25,6 @@ public interface IASTExpressionVisitor
 
     void visit (LessThan a);
 
+    void visit (GreaterThan a);
+
 }

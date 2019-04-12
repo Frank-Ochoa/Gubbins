@@ -87,4 +87,9 @@ public class CheckUses implements IASTExpressionVisitor
 		checkUses(a.getLeft());
 		checkUses(a.getRight());
 	}
+
+	@Override public void visit(GreaterThan a)
+	{
+
+	}
 }
