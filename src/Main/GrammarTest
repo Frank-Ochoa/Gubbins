@@ -1,0 +1,5 @@
+arr arr double y := arr arr double (5, 10);
+
+y[0][1] := 2;
+
+print y[0][1];

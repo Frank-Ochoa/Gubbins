@@ -1,0 +1,356 @@
+PARSER_BEGIN(Gubbins)
+
+package Gubbins.Parser;
+import ast.*;
+import java.util.LinkedList;
+import java.util.List;
+
+public class Gubbins
+{
+}
+
+PARSER_END(Gubbins)
+
+
+SKIP :    //what in our programming lang can be treated as white space
+	  //this says skip spaces or tabs or next lines   | = or
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+TOKEN : /* RESERVED WORDS*/
+{
+        <WHILE : "while">
+    |   <IF : "if">
+    |   <TRUE: "true" >
+    |   <FALSE: "false" >
+    |   <FOR: "for" >
+    |   <IN: "in" >
+    |   <RANGE: "range" >
+    |   <PRINT: "print" >
+    |   <DO:    "do" >
+}
+
+TOKEN : /* TYPES */
+{
+        <TYPE_INT : "int">
+    |   <TYPE_DOUBLE: "double">
+    |   <TYPE_BOOLEAN: "bool">
+    |   <TYPE_ARRAY : "arr" >
+}
+
+TOKEN : /* IDENTIFIERS */ //a token is one unit of information
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* > //this says an ID has to start with a 						        letter followed by 0 or more letters or 						digits
+|
+  < #LETTER: ["_","a"-"z","A"-"Z"] >
+|
+  < #DIGIT: ["0"-"9"] >
+}
+
+TOKEN : /* LITERALS */
+{
+        < INTEGER_LITERAL:  (<DIGIT>)+ >    //careful with * and +
+   |    < DOUBLE_LITERAL: <INTEGER_LITERAL> "." <INTEGER_LITERAL> >
+}
+
+
+
+TOKEN : /* OPERATORS*/
+{
+        <PLUS : "+">
+    |   <MULT : "*">
+    |   <DIV : "/">
+    |   <SUB : "-">
+    |   <ASSIGN_EQUALS : ":=">
+    |   <SEMI : ";">
+    |   <LCURLY : "{">
+    |   <RCURLY : "}">
+    |   <LPAREN : "(" >
+    |   <RPAREN : ")" >
+    |   <COMMA : "," >
+    |   <DOT : ".">
+    |   <LBRACK: "[">
+    |   <RBRACK: "]">
+}
+
+
+TOKEN : /* BOOLEAN CONDITIONALS */
+{
+	<GREATER_THAN : ">" >
+	|
+	<GREATER_THAN_EQTO : ">=" >
+	|
+	<LESS_THAN : "<" >
+	|
+	<LESS_THAN_EQTO : "<=" >
+	|
+	<EQ_TO : "=" >
+	|
+	<NOT_EQ_TO : "!=" >
+}
+
+/** Top level production. */
+List<IASTStatement> Input() :
+{
+    List<IASTStatement> result;
+}
+{
+    result = Statements()
+    <EOF>
+    { return result; }
+}
+
+IASTStatement Statement() :
+{
+    IASTStatement s;
+}
+{
+    LOOKAHEAD(2)
+
+	        s = Assignment()  <SEMI>  { return s; }
+            |   <PRINT> s = Print() <SEMI>          { return s; }
+            |   s = DoWhileLoop()            { return s; }
+            |   s = ForLoop()              { return s; }
+            |   s = WhileLoop()         { return s; }
+            |   s = If()                { return s; }
+}
+
+List<IASTStatement> Statements() :
+{
+    IASTStatement s;
+    LinkedList<IASTStatement> result = new LinkedList<IASTStatement>();
+}
+{
+    (s = Statement() { result.add(s); })+
+    { return result; }
+}
+
+While WhileLoop() :
+{
+    List<IASTStatement> stmts;
+    IASTExpr expr;
+}
+{
+    <WHILE> <LPAREN> expr = Expression() <RPAREN>
+    <LCURLY>
+        stmts = Statements()
+    <RCURLY>
+    { return new While(expr, stmts); }
+}
+
+For ForLoop() :
+{
+    List<IASTStatement> stmts;
+    IASTExpr expr;
+    Token t;
+}
+{
+    <FOR> t = <IDENTIFIER> <IN> <RANGE> expr = Expression()
+    <LCURLY>
+        stmts = Statements()
+    <RCURLY>
+    { return new For(new Identifier(t.image), expr, stmts); }
+}
+
+IASTStatement Print() :
+{
+    IASTExpr e;
+}
+{
+	 e = Expression()
+	{ return new Print(e); }
+}
+
+IASTExpr Expression() :
+{
+    IASTExpr e;
+}
+{
+    e = ConditionalExpression() { return e; }
+}
+
+IASTExpr ConditionalExpression() :
+{
+    IASTExpr result, b;
+}
+{
+    result = AdditiveExpression()
+    (
+        <LESS_THAN> b = AdditiveExpression() {result = new LessThan(result, b);}
+        // And can do other conditionals under this if need be
+    )*
+
+    {return result;}
+}
+
+IASTExpr AdditiveExpression() :
+{
+    IASTExpr result, b;
+}
+{
+    result = MultiplicativeExpression()
+    (
+
+            <PLUS> b = MultiplicativeExpression() {result = new Plus(result, b);}
+        |    <SUB> b = MultiplicativeExpression() {result = new Sub(result, b);}
+
+    )*
+    { return result; }
+}
+
+IASTExpr MultiplicativeExpression() :
+{
+    IASTExpr result, b;
+}
+{
+    result = ArrayIndexExpression()
+    (
+           <MULT> b = ArrayIndexExpression() {result = new Mult(result, b);}
+        |  <DIV>  b = ArrayIndexExpression() {result = new Div(result, b); }
+
+    )*
+    { return result; }
+}
+
+IASTExpr ArrayIndexExpression() :
+{
+    IASTExpr result;
+    IASTExpr index;
+    List<IASTExpr> indices = new LinkedList<IASTExpr>();
+}
+{
+    result = AtomicExpression()
+    (
+        <LBRACK> index = Expression() {indices.add(index);} <RBRACK>
+    )*
+
+    {
+        if(indices.isEmpty())
+        {
+            return result;
+        }
+        else
+        {
+            return new ArrayIndex(result, indices);
+        }
+    }
+
+}
+
+IASTExpr AtomicExpression() :
+{
+    IASTExpr e;
+    Token t;
+}
+{
+        t = <INTEGER_LITERAL>   { return new Int(Integer.parseInt(t.image)); }
+    |   t = <DOUBLE_LITERAL>    { return new Dble(Double.parseDouble(t.image)); }
+    |   t = <IDENTIFIER>        { return new Identifier(t.image); }
+    |   <TRUE>                  { return new Bool(true); }
+    |   <FALSE>                 { return new Bool(false); }
+    |   e = Array()             { return e; }
+}
+
+IASTStatement Assignment() :
+{
+    Token t;
+    IASTType x = null;
+    List<IASTExpr> indices = new LinkedList <IASTExpr>();
+    IASTExpr index;
+    IASTExpr e = null;
+}
+{
+   (x = Type())? t = <IDENTIFIER> (<LBRACK> index = Expression() <RBRACK> { indices.add(index); })*  (<ASSIGN_EQUALS> e = Expression())?
+   {
+     if(x == null && e == null)
+     {
+        throw new ParseException("You done goofed, GL");
+     }
+     else if(x != null && e == null)
+     {
+        return new Declaration(x, new Identifier(t.image), indices);
+     }
+     else if(x == null && e != null)
+     {
+        return new Assignment(new Identifier(t.image), e, indices);
+     }
+     else
+     {
+        return new DeclareAssign(x, new Identifier(t.image), e, indices);
+     }
+   }
+}
+
+IASTType Type() :
+{
+    IASTType t;
+}
+{
+              t = AtomicType()   {return t;}
+     |  <TYPE_ARRAY> t = Type()      {return new TypeArray(t);}
+
+}
+
+IASTType AtomicType() :
+{
+}
+{
+         <TYPE_INT>               {return TypeInt.INT;}
+    |    <TYPE_DOUBLE>            {return TypeDouble.DOUBLE;}
+    |    <TYPE_BOOLEAN>           {return TypeBoolean.BOOLEAN;}
+}
+
+// Do this as an assignment
+Array Array() :
+{
+    IASTExpr e;
+    IASTType t;
+    List<IASTExpr> rhs = new LinkedList<IASTExpr>();
+}
+{
+   t = Type() <LPAREN> e = Expression() { rhs.add(e); } (<COMMA> e = Expression() {rhs.add(e);})* <RPAREN>
+
+   {return new Array(t, rhs);}
+}
+
+DoWhile DoWhileLoop() :
+{
+    List<IASTStatement> stmts;
+    IASTExpr expr;
+}
+{
+    <DO>
+    <LCURLY>
+        stmts = Statements()
+    <RCURLY>
+    <WHILE> <LPAREN> expr = Expression() <RPAREN>
+    {return new DoWhile(expr, stmts);}
+}
+
+If If() :
+{
+    List<IASTStatement> stmts;
+    IASTExpr condt;
+}
+{
+    <IF> <LPAREN> condt = Expression() <RPAREN>
+    <LCURLY>
+        stmts = Statements()
+    <RCURLY>
+
+    {return new If(condt, stmts);}
+}
+
+
+
+
+
+
+
+
+
+
