@@ -68,11 +68,27 @@ public class ExpressionEvaluator implements INExprVisitor
 		ret(identValue);
 	}
 
-	private Object[] generateArray(List<Integer> sizes)
+	public Object returnDefaultValue(IType type)
+	{
+		if (type == NTypeInt.INT)
+		{
+			return 0;
+		}
+		else if(type == NTypeDouble.DOUBLE)
+		{
+			return 0.0;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	private Object generateArray(List<Integer> sizes, IType arrayType)
 	{
 		if (sizes.isEmpty())
 		{
-			return null;
+			return returnDefaultValue(arrayType);
 		}
 
 		int n = sizes.get(0);
@@ -80,7 +96,7 @@ public class ExpressionEvaluator implements INExprVisitor
 		Object[] array = new Object[n];
 		for (int i = 0; i < n; i++)
 		{
-			array[i] = generateArray(sizes.subList(1, sizes.size()));
+			array[i] = generateArray(sizes.subList(1, sizes.size()), arrayType);
 		}
 
 		return array;
@@ -94,10 +110,13 @@ public class ExpressionEvaluator implements INExprVisitor
 		// Evaluate those expressions to get their values, or in other words the literal sizes
 		List<Integer> sizes = evalList(a.getSize());
 
+		TypeTypeChecker typeTypeChecker = new TypeTypeChecker();
+		IType arrayType = typeTypeChecker.typecheck(a.getType());
+
 		// sizes.size() = the number of dimensions you need
 		// then loop through the list, filling in those values
 
-		ret(generateArray(sizes));
+		ret(generateArray(sizes, arrayType));
 
 	}
 

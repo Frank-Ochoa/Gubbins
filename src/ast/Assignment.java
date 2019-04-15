@@ -4,6 +4,7 @@ import java.util.List;
 
 public class Assignment implements IASTStatement
 {
+    // Change Identifier to be just an expression eventually
     private Identifier lhs;
     private IASTExpr rhs;
     private List<IASTExpr> indicies;

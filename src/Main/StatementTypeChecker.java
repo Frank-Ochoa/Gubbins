@@ -78,7 +78,8 @@ public class StatementTypeChecker implements IASTStatementVisitor
 		// Get declared type od Iden
 		IType declareType = typeTypeCheck.typecheck(a.getType());
 
-		// Make sure Iden is not already within scope
+		// Make sure Iden is not already within scope, look up closet scope, comment this out for
+		// standard lexical analysis
 		if (typeEnvironment.lookup(a.getIden().getName()) != null)
 		{
 			throw new TypeException(a.getIden().getName() + " ALREADY DEFINED IN SCOPE");
@@ -159,6 +160,7 @@ public class StatementTypeChecker implements IASTStatementVisitor
 
 	@SuppressWarnings("Duplicates") @Override public void visit(Assignment a)
 	{
+		// Change the LHS to be just an expression
 		NIdentifier lhs = (NIdentifier) exprTypeCheck.typecheck(a.getLhs());
 		INExpr rhs = exprTypeCheck.typecheck(a.getRhs());
 
@@ -247,7 +249,7 @@ public class StatementTypeChecker implements IASTStatementVisitor
 		body.add(new NAssignment(var, new NPlus(var, new NInt(1))));
 
 		List<INStatement> initializers = new LinkedList<>();
-		initializers.add(new NAssignment(var, new NInt(0)));
+		initializers.add(new NDeclareAssign(NTypeInt.INT, var, new NInt(0)));
 
 		//  this should be a less than node
 		INExpr condt = new NLessThan(var, range);
@@ -282,7 +284,7 @@ public class StatementTypeChecker implements IASTStatementVisitor
 		// Create the list of initializers to pass through, which in this case will be just of size 1
 		List<INStatement> initializers = new LinkedList<>();
 		// Add to the list that initialTrue is well, initially true
-		initializers.add(new NAssignment(initialTrue, new NBool(true)));
+		initializers.add(new NDeclareAssign(NTypeBoolean.BOOLEAN, initialTrue, new NBool(true)));
 
 		INExpr condt = exprTypeCheck.typecheck(a.getCond());
 

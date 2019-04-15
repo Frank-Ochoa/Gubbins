@@ -27,9 +27,29 @@ for i in range arrayLength
     }
 }
 
-for i in range arrayLength
+print array;
+
+int test := 5;
+
+if(test < 6)
 {
-    print array[i];
+    test := 7;
+}
+
+print test;
+
+int i := 0;
+
+do
+{
+    print i;
+    i := i + 1;
+}while(i < 10)
+
+while(i < 20)
+{
+    print i;
+    i := i + 1;
 }
 
 

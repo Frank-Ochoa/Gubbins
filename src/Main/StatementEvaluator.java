@@ -4,6 +4,7 @@ import ntree.*;
 import symtab.ISymTab;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class StatementEvaluator implements INStatementVisitor
@@ -33,7 +34,12 @@ public class StatementEvaluator implements INStatementVisitor
 	@Override public void visit(NDeclaration a)
 	{
 		String ident = a.getRhs().getName();
-		evalEnviroment.declare(ident, null);
+
+		// Just call the array method
+		TypeTypeChecker typeTypeChecker = new TypeTypeChecker();
+		IType declareType = typeTypeChecker.typecheck(a.getLhs());
+
+		evalEnviroment.declare(ident, exprEval.returnDefaultValue(declareType));
 	}
 
 	@Override public void visit(NDeclareAssign a)
@@ -53,7 +59,9 @@ public class StatementEvaluator implements INStatementVisitor
 		{
 			String ident = a.getLhs().getName();
 			Object value = exprEval.eval(a.getRhs());
-			evalEnviroment.declare(ident, value);
+
+			// keep going back to find a map that has that ident, and declare this value there
+			evalEnviroment.declareCheckIfThere(ident, value);
 		}
 		// Else it's an array index assignment
 		else
@@ -83,13 +91,23 @@ public class StatementEvaluator implements INStatementVisitor
 	{
 		if ((Boolean) exprEval.eval(a.getCondition()))
 		{
+			evalEnviroment.enterNewScope();
 			eval(a.getStatements());
+			evalEnviroment.exitScope();
 		}
 	}
 
 	@Override public void visit(NPrint a)
 	{
-		System.out.println(exprEval.eval(a.getExpr()));
+		Object x = exprEval.eval(a.getExpr());
+		if (x instanceof Object[])
+		{
+			System.out.println(Arrays.toString((Object[]) x));
+		}
+		else
+		{
+			System.out.println(x);
+		}
 	}
 
 	@Override public void visit(NWhile a)
@@ -98,16 +116,13 @@ public class StatementEvaluator implements INStatementVisitor
 
 		eval(a.getInitializers());
 
-		while (true)
+		while ((Boolean) exprEval.eval(a.getCondt()))
 		{
-			if ((Boolean) exprEval.eval(a.getCondt()))
-			{
-				eval(a.getBody());
-			}
-			else
-			{
-				break;
-			}
+			evalEnviroment.enterNewScope();
+			eval(a.getBody());
+			evalEnviroment.exitScope();
 		}
+
+		evalEnviroment.exitScope();
 	}
 }

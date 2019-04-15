@@ -20,6 +20,18 @@ public class SymTab<T> implements ISymTab<T>
         scopes.get(0).put(name, type);
     }
 
+    public void declareCheckIfThere(String name, T type)
+    {
+        for (Map<String, T> scope : scopes)
+        {
+            if(scope.containsKey(name))
+            {
+                scope.put(name, type);
+                break;
+            }
+        }
+    }
+
     @Override
     public T lookup(String name)
     {

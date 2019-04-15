@@ -5,6 +5,7 @@ import java.util.List;
 
 public class NAssignment implements INStatement
 {
+    // Change the NIdentifier to be just an expression once functions are implemented
     private NIdentifier lhs;
     private INExpr rhs;
     private List<INExpr> indices;
