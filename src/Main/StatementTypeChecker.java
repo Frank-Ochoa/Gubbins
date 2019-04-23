@@ -192,7 +192,6 @@ public class StatementTypeChecker implements IASTStatementVisitor
 
 		if (lhs.getType() == NTypeDouble.DOUBLE && rhs.getType() == NTypeInt.INT)
 		{
-			System.out.println("Before promote in assign");
 			rhs = promote(rhs);
 		}
 		else if (innerType != null)
