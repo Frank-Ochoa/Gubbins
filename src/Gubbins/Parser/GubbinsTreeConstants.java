@@ -21,6 +21,7 @@ public interface GubbinsTreeConstants
   public int JJTARRAY = 15;
   public int JJTDOWHILELOOP = 16;
   public int JJTIF = 17;
+  public int JJTFUNCTION = 18;
 
 
   public String[] jjtNodeName = {
@@ -42,6 +43,7 @@ public interface GubbinsTreeConstants
     "Array",
     "DoWhileLoop",
     "If",
+    "Function",
   };
 }
-/* JavaCC - OriginalChecksum=2ef10ea72ddb7360b06c269b29aa587d (do not edit this line) */
+/* JavaCC - OriginalChecksum=7b541b8b5c1d75d5136a5c29ad71b7c2 (do not edit this line) */

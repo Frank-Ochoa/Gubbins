@@ -9,9 +9,6 @@ public class Array implements IASTExpr
 	private IASTType type;
 	private List<IASTExpr> size;
 
-	// Array value has a type and list of size that represent the dimensions of the array, I need to know
-	// that size though
-	// IAST Expr within the list has to to represent an int
 	public Array(IASTType type, List<IASTExpr> size)
 	{
 		this.type = type;

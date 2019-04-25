@@ -32,6 +32,8 @@ TOKEN : /* RESERVED WORDS*/
     |   <RANGE: "range" >
     |   <PRINT: "print" >
     |   <DO:    "do" >
+    |   <FUNC: "func" >
+    |   <ARROW: "->">
 }
 
 TOKEN : /* TYPES */
@@ -288,11 +290,15 @@ IASTStatement Assignment() :
 
 IASTType Type() :
 {
+    List<IASTType> args = new LinkedList<IASTType>();
     IASTType t;
+    IASTType result;
 }
 {
-              t = AtomicType()   {return t;}
-     |  <TYPE_ARRAY> t = Type()      {return new TypeArray(t);}
+       t = AtomicType()   {return t;}
+     | <TYPE_ARRAY> t = Type()      {return new TypeArray(t);}
+     | <LPAREN> t = Type() {args.add(t);} (<COMMA> t = Type() {args.add(t);})* <RPAREN> {return new TypeArgs(args);}
+     | <FUNC> t = Type() <ARROW> result = Type() {return new TypeFunction(t, result);}
 
 }
 
@@ -345,6 +351,27 @@ If If() :
 
     {return new If(condt, stmts);}
 }
+
+Function Function() :
+{
+    IASTType def;
+    Token t;
+    List<IASTStatement> stmts;
+    List<IASTExpr> idents = new LinkedList<IASTExpr>();
+}
+{
+    def = Type()
+    <LPAREN>
+    t = <IDENTIFIER> {idents.add(new Identifier(t.image));} (<COMMA> t = <IDENTIFIER> {idents.add(new Identifier(t.image));})*
+    <RPAREN>
+    <LBRACK>
+        stmts = Statements()
+    <RBRACK>
+
+    {return new Function(def, idents, stmts);}
+}
+
+// Could do AtomicType() <IDENT>, then return a hashmap of them
 
 
 

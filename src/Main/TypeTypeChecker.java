@@ -3,6 +3,8 @@ package Main;
 import ast.*;
 import ntree.*;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 
 public class TypeTypeChecker implements IASTTypeVisitor, ITypeVisitor
@@ -63,6 +65,25 @@ public class TypeTypeChecker implements IASTTypeVisitor, ITypeVisitor
 		ret(new NTypeArray(tcheck(a.getType())));
 	}
 
+	@Override public void visit(TypeFunction a)
+	{
+		NTypeArgs args = (NTypeArgs) tcheck(a.getArgs());
+		IType returnType = tcheck(a.getResult());
+
+		ret(new NTypeFunction(args, returnType));
+	}
+
+	@Override public void visit(TypeArgs a)
+	{
+		List<IType> nArgs = new LinkedList<>();
+		// Normalize the list of types
+		for(IASTType type : a.getArgs())
+		{
+			nArgs.add(tcheck(type));
+		}
+		ret(new NTypeArgs(nArgs));
+	}
+
 	public void visit(NTypeArray a)
 	{
 		ret(tcheck(a.getType()));
@@ -81,5 +102,15 @@ public class TypeTypeChecker implements IASTTypeVisitor, ITypeVisitor
 	@Override public void visit(NTypeDouble a)
 	{
 		ret(NTypeDouble.DOUBLE);
+	}
+
+	@Override public void visit(NTypeFunction a)
+	{
+
+	}
+
+	@Override public void visit(NTypeArgs a)
+	{
+
 	}
 }

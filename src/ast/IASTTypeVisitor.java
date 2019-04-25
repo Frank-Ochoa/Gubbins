@@ -9,4 +9,8 @@ public interface IASTTypeVisitor
 	void visit(TypeDouble a);
 
 	void visit(TypeArray a);
+
+	void visit(TypeFunction a);
+
+	void visit(TypeArgs a);
 }
