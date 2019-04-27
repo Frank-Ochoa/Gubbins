@@ -39,6 +39,9 @@ public class StatementEvaluator implements INStatementVisitor
 		TypeTypeChecker typeTypeChecker = new TypeTypeChecker();
 		IType declareType = typeTypeChecker.typecheck(a.getLhs());
 
+		// Have to do something different for functions here, because, I mean, where is their default return type?
+		// The default of the type of the return type? weird
+
 		evalEnviroment.declare(ident, exprEval.returnDefaultValue(declareType));
 	}
 

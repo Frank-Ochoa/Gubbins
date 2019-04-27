@@ -7,5 +7,5 @@ public interface ITypeVisitor
 	void visit (NTypeInt a);
 	void visit (NTypeDouble a);
 	void visit (NTypeFunction a);
-	void visit (NTypeArgs a);
+	void visit (NTypeRecord a);
 }

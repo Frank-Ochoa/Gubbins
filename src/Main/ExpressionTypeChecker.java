@@ -119,6 +119,27 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		ret(new NArrayIndex(arrayType, array, indices));
 	}
 
+	@Override public void visit(Function a)
+	{
+		// Possibly needs a new scope
+		TypeTypeChecker t = new TypeTypeChecker();
+		// Need to make sure this is a TypeFunction
+		IType functionType = t.typecheck(a.getTypeFunction());
+		if((!(functionType instanceof NTypeFunction)))
+		{
+			throw new TypeException("NOT A TYPE FUNCTION");
+		}
+
+
+
+	}
+
+	@Override public void visit(Record a)
+	{
+		//Possibly needs a new scope
+
+	}
+
 	@Override public void visit(Identifier a)
 	{
 		IType type = typeEnvironment.lookup(a.getName());
@@ -155,21 +176,6 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 	public void visit(Mult a)
 	{
-		/*INExpr l = tcheck(a.getLeft());
-		checkIsNumeric(l);
-
-		INExpr r = tcheck(a.getRight());
-		checkIsNumeric(r);
-
-		if (l.getType() == NTypeInt.INT && r.getType() == NTypeInt.INT)
-		{
-			ret(new NMult(l, r));
-		}
-		else
-		{
-			ret(new NMult(promote(l), promote(r)));
-		}*/
-
 		normalizeExprOperator(a);
 	}
 

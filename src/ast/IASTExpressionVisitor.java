@@ -15,6 +15,8 @@ public interface IASTExpressionVisitor
 
     void visit (ArrayIndex a);
 
+    void visit (Function a);
+
     void visit (Mult a);
 
     void visit (Plus a);
@@ -26,5 +28,7 @@ public interface IASTExpressionVisitor
     void visit (LessThan a);
 
     void visit (GreaterThan a);
+
+    void visit (Record a);
 
 }

@@ -33,63 +33,65 @@ public interface GubbinsConstants {
   /** RegularExpression Id. */
   int ARROW = 15;
   /** RegularExpression Id. */
-  int TYPE_INT = 16;
+  int REC = 16;
   /** RegularExpression Id. */
-  int TYPE_DOUBLE = 17;
+  int TYPE_INT = 17;
   /** RegularExpression Id. */
-  int TYPE_BOOLEAN = 18;
+  int TYPE_DOUBLE = 18;
   /** RegularExpression Id. */
-  int TYPE_ARRAY = 19;
+  int TYPE_BOOLEAN = 19;
   /** RegularExpression Id. */
-  int IDENTIFIER = 20;
+  int TYPE_ARRAY = 20;
   /** RegularExpression Id. */
-  int LETTER = 21;
+  int IDENTIFIER = 21;
   /** RegularExpression Id. */
-  int DIGIT = 22;
+  int LETTER = 22;
   /** RegularExpression Id. */
-  int INTEGER_LITERAL = 23;
+  int DIGIT = 23;
   /** RegularExpression Id. */
-  int DOUBLE_LITERAL = 24;
+  int INTEGER_LITERAL = 24;
   /** RegularExpression Id. */
-  int PLUS = 25;
+  int DOUBLE_LITERAL = 25;
   /** RegularExpression Id. */
-  int MULT = 26;
+  int PLUS = 26;
   /** RegularExpression Id. */
-  int DIV = 27;
+  int MULT = 27;
   /** RegularExpression Id. */
-  int SUB = 28;
+  int DIV = 28;
   /** RegularExpression Id. */
-  int ASSIGN_EQUALS = 29;
+  int SUB = 29;
   /** RegularExpression Id. */
-  int SEMI = 30;
+  int ASSIGN_EQUALS = 30;
   /** RegularExpression Id. */
-  int LCURLY = 31;
+  int SEMI = 31;
   /** RegularExpression Id. */
-  int RCURLY = 32;
+  int LCURLY = 32;
   /** RegularExpression Id. */
-  int LPAREN = 33;
+  int RCURLY = 33;
   /** RegularExpression Id. */
-  int RPAREN = 34;
+  int LPAREN = 34;
   /** RegularExpression Id. */
-  int COMMA = 35;
+  int RPAREN = 35;
   /** RegularExpression Id. */
-  int DOT = 36;
+  int COMMA = 36;
   /** RegularExpression Id. */
-  int LBRACK = 37;
+  int DOT = 37;
   /** RegularExpression Id. */
-  int RBRACK = 38;
+  int LBRACK = 38;
   /** RegularExpression Id. */
-  int GREATER_THAN = 39;
+  int RBRACK = 39;
   /** RegularExpression Id. */
-  int GREATER_THAN_EQTO = 40;
+  int GREATER_THAN = 40;
   /** RegularExpression Id. */
-  int LESS_THAN = 41;
+  int GREATER_THAN_EQTO = 41;
   /** RegularExpression Id. */
-  int LESS_THAN_EQTO = 42;
+  int LESS_THAN = 42;
   /** RegularExpression Id. */
-  int EQ_TO = 43;
+  int LESS_THAN_EQTO = 43;
   /** RegularExpression Id. */
-  int NOT_EQ_TO = 44;
+  int EQ_TO = 44;
+  /** RegularExpression Id. */
+  int NOT_EQ_TO = 45;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -112,6 +114,7 @@ public interface GubbinsConstants {
     "\"do\"",
     "\"func\"",
     "\"->\"",
+    "\"rec\"",
     "\"int\"",
     "\"double\"",
     "\"bool\"",

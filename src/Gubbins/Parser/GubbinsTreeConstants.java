@@ -16,12 +16,14 @@ public interface GubbinsTreeConstants
   public int JJTARRAYINDEXEXPRESSION = 10;
   public int JJTATOMICEXPRESSION = 11;
   public int JJTASSIGNMENT = 12;
-  public int JJTTYPE = 13;
-  public int JJTATOMICTYPE = 14;
-  public int JJTARRAY = 15;
-  public int JJTDOWHILELOOP = 16;
-  public int JJTIF = 17;
-  public int JJTFUNCTION = 18;
+  public int JJTFUNCTIONTYPE = 13;
+  public int JJTTYPE = 14;
+  public int JJTATOMICTYPE = 15;
+  public int JJTARRAY = 16;
+  public int JJTDOWHILELOOP = 17;
+  public int JJTIF = 18;
+  public int JJTRECORD = 19;
+  public int JJTFUNCTION = 20;
 
 
   public String[] jjtNodeName = {
@@ -38,12 +40,14 @@ public interface GubbinsTreeConstants
     "ArrayIndexExpression",
     "AtomicExpression",
     "Assignment",
+    "FunctionType",
     "Type",
     "AtomicType",
     "Array",
     "DoWhileLoop",
     "If",
+    "Record",
     "Function",
   };
 }
-/* JavaCC - OriginalChecksum=7b541b8b5c1d75d5136a5c29ad71b7c2 (do not edit this line) */
+/* JavaCC - OriginalChecksum=c285025f73c2385311469f9967c9786d (do not edit this line) */

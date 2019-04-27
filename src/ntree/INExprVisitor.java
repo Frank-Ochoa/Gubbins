@@ -16,4 +16,6 @@ public interface INExprVisitor
 	void visit(NGreaterThan a);
 	void visit(Promote a);
 	void visit(NOR a);
+	void visit(NRecord a);
+	void visit(NFunction a);
 }

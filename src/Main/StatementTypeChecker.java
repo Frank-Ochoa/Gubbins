@@ -5,7 +5,6 @@ import ntree.*;
 import symtab.ISymTab;
 import types.TypeException;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -24,11 +23,6 @@ public class StatementTypeChecker implements IASTStatementVisitor
 		this.typeEnvironment = typeEnvironment;
 		this.typeTypeCheck = new TypeTypeChecker();
 		this.exprTypeCheck = new ExpressionTypeChecker(typeEnvironment);
-	}
-
-	public ISymTab getTypeEnvironment()
-	{
-		return typeEnvironment;
 	}
 
 	private void ret(INStatement e)
@@ -243,7 +237,6 @@ public class StatementTypeChecker implements IASTStatementVisitor
 			body.add(tcheck(node));
 		}
 		typeEnvironment.exitScope();
-		// Looping would be done here?
 		NIdentifier var = new NIdentifier(a.getIdentifier().getName(), NTypeInt.INT);
 		body.add(new NAssignment(var, new NPlus(var, new NInt(1))));
 

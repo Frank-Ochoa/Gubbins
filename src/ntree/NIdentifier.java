@@ -15,6 +15,18 @@ public class NIdentifier extends Expr
         return name;
     }
 
+    @Override public boolean equals(Object obj)
+    {
+        if (!(obj instanceof NIdentifier))
+        {
+            return false;
+        }
+
+        NIdentifier iden = (NIdentifier) obj;
+
+        return (this.getType().equals(iden.getType()) && this.name.equals(iden.name));
+    }
+
     @Override public void visit(INExprVisitor visitor)
     {
         visitor.visit(this);

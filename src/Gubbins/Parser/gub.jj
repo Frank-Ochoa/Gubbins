@@ -4,6 +4,9 @@
 package Gubbins.Parser;
 import ast.*;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class Gubbins/*@bgen(jjtree)*/implements GubbinsTreeConstants/*@egen*/
@@ -38,6 +41,7 @@ TOKEN : /* RESERVED WORDS*/
     |   <DO:    "do" >
     |   <FUNC: "func" >
     |   <ARROW: "->">
+    |   <REC:   "rec">
 }
 
 TOKEN : /* TYPES */
@@ -624,8 +628,9 @@ IASTExpr AtomicExpression() :
     Token t;
 }
 {/*@bgen(jjtree) AtomicExpression */
-        try {
+    try {
 /*@egen*/
+    LOOKAHEAD(1)
         t = <INTEGER_LITERAL>/*@bgen(jjtree)*/
                                 {
                                   jjtree.closeNodeScope(jjtn000, true);
@@ -656,31 +661,31 @@ IASTExpr AtomicExpression() :
                                   jjtc000 = false;
                                 }
 /*@egen*/                 { return new Bool(false); }
-    |   e = Array()/*@bgen(jjtree)*/
-                                {
-                                  jjtree.closeNodeScope(jjtn000, true);
-                                  jjtc000 = false;
-                                }
-/*@egen*/             { return e; }/*@bgen(jjtree)*/
-        } catch (Throwable jjte000) {
-          if (jjtc000) {
-            jjtree.clearNodeScope(jjtn000);
-            jjtc000 = false;
-          } else {
-            jjtree.popNode();
-          }
-          if (jjte000 instanceof RuntimeException) {
-            throw (RuntimeException)jjte000;
-          }
-          if (jjte000 instanceof ParseException) {
-            throw (ParseException)jjte000;
-          }
-          throw (Error)jjte000;
-        } finally {
-          if (jjtc000) {
-            jjtree.closeNodeScope(jjtn000, true);
-          }
-        }
+    |     LOOKAHEAD(2) (e = Array() | e = Function() )/*@bgen(jjtree)*/
+                                                                 {
+                                                                   jjtree.closeNodeScope(jjtn000, true);
+                                                                   jjtc000 = false;
+                                                                 }
+/*@egen*/           { return e;}/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
 /*@egen*/
 }
 
@@ -745,19 +750,72 @@ IASTStatement Assignment() :
 /*@egen*/
 }
 
+IASTType FunctionType() :
+{/*@bgen(jjtree) FunctionType */
+    SimpleNode jjtn000 = new SimpleNode(JJTFUNCTIONTYPE);
+    boolean jjtc000 = true;
+    jjtree.openNodeScope(jjtn000);
+/*@egen*/
+    IASTType t;
+    IASTType result;
+}
+{/*@bgen(jjtree) FunctionType */
+    try {
+/*@egen*/
+    result = Type()
+    (
+        <ARROW> t = Type() {return new TypeFunction(result, t);}
+    )*/*@bgen(jjtree)*/
+    {
+      jjtree.closeNodeScope(jjtn000, true);
+      jjtc000 = false;
+    }
+/*@egen*/
+
+    {return result;}/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
+/*@egen*/
+}
+
 IASTType Type() :
 {/*@bgen(jjtree) Type */
     SimpleNode jjtn000 = new SimpleNode(JJTTYPE);
     boolean jjtc000 = true;
     jjtree.openNodeScope(jjtn000);
 /*@egen*/
-    List<IASTType> args = new LinkedList<IASTType>();
     IASTType t;
     IASTType result;
+    Token ident;
+    List<IASTType> args = new LinkedList<IASTType>();
+    List<Identifier> idents = new LinkedList<Identifier>();
+    Map<Identifier, IASTType> record = new HashMap<Identifier, IASTType>();
+
+
 }
 {/*@bgen(jjtree) Type */
        try {
 /*@egen*/
+
+
+
        t = AtomicType()/*@bgen(jjtree)*/
                           {
                             jjtree.closeNodeScope(jjtn000, true);
@@ -770,18 +828,24 @@ IASTType Type() :
                                       jjtc000 = false;
                                     }
 /*@egen*/      {return new TypeArray(t);}
-     | <LPAREN> t = Type() {args.add(t);} (<COMMA> t = Type() {args.add(t);})* <RPAREN>/*@bgen(jjtree)*/
-                                                                                        {
-                                                                                          jjtree.closeNodeScope(jjtn000, true);
-                                                                                          jjtc000 = false;
-                                                                                        }
-/*@egen*/ {return new TypeArgs(args);}
-     | <FUNC> t = Type() <ARROW> result = Type()/*@bgen(jjtree)*/
-                                                 {
-                                                   jjtree.closeNodeScope(jjtn000, true);
-                                                   jjtc000 = false;
-                                                 }
-/*@egen*/ {return new TypeFunction(t, result);}/*@bgen(jjtree)*/
+     | <LPAREN> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));}
+     (<COMMA> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));})* <RPAREN>/*@bgen(jjtree)*/
+     {
+       jjtree.closeNodeScope(jjtn000, true);
+       jjtc000 = false;
+     }
+/*@egen*/
+     {
+
+     Iterator<Identifier> it1 = idents.iterator();
+     Iterator<IASTType> it2 = args.iterator();
+     while(it1.hasNext() && it2.hasNext())
+     {
+        record.put(it1.next(), it2.next());
+     }
+
+     return new TypeRecord(record);
+     }/*@bgen(jjtree)*/
        } catch (Throwable jjte000) {
          if (jjtc000) {
            jjtree.clearNodeScope(jjtn000);
@@ -802,8 +866,8 @@ IASTType Type() :
          }
        }
 /*@egen*/
-
 }
+
 
 IASTType AtomicType() :
 {/*@bgen(jjtree) AtomicType */
@@ -975,34 +1039,18 @@ If If() :
 /*@egen*/
 }
 
-Function Function() :
-{/*@bgen(jjtree) Function */
-    SimpleNode jjtn000 = new SimpleNode(JJTFUNCTION);
+Record Record() :
+{/*@bgen(jjtree) Record */
+    SimpleNode jjtn000 = new SimpleNode(JJTRECORD);
     boolean jjtc000 = true;
     jjtree.openNodeScope(jjtn000);
 /*@egen*/
-    IASTType def;
-    Token t;
-    List<IASTStatement> stmts;
-    List<IASTExpr> idents = new LinkedList<IASTExpr>();
+    IASTType type;
 }
-{/*@bgen(jjtree) Function */
+{/*@bgen(jjtree) Record */
     try {
 /*@egen*/
-    def = Type()
-    <LPAREN>
-    t = <IDENTIFIER> {idents.add(new Identifier(t.image));} (<COMMA> t = <IDENTIFIER> {idents.add(new Identifier(t.image));})*
-    <RPAREN>
-    <LBRACK>
-        stmts = Statements()
-    <RBRACK>/*@bgen(jjtree)*/
-    {
-      jjtree.closeNodeScope(jjtn000, true);
-      jjtc000 = false;
-    }
-/*@egen*/
-
-    {return new Function(def, idents, stmts);}/*@bgen(jjtree)*/
+    <REC> type = Type()/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -1022,5 +1070,50 @@ Function Function() :
         jjtree.closeNodeScope(jjtn000, true);
       }
     }
+/*@egen*/
+}
+
+Function Function() :
+{/*@bgen(jjtree) Function */
+    SimpleNode jjtn000 = new SimpleNode(JJTFUNCTION);
+    boolean jjtc000 = true;
+    jjtree.openNodeScope(jjtn000);
+/*@egen*/
+    IASTType def;
+    List<IASTStatement> stmts;
+}
+{/*@bgen(jjtree) Function */
+   try {
+/*@egen*/
+   <FUNC> def = FunctionType()
+    <LCURLY>
+        stmts = Statements()
+    <RCURLY>/*@bgen(jjtree)*/
+    {
+      jjtree.closeNodeScope(jjtn000, true);
+      jjtc000 = false;
+    }
+/*@egen*/
+
+    {return new Function(def, stmts);}/*@bgen(jjtree)*/
+   } catch (Throwable jjte000) {
+     if (jjtc000) {
+       jjtree.clearNodeScope(jjtn000);
+       jjtc000 = false;
+     } else {
+       jjtree.popNode();
+     }
+     if (jjte000 instanceof RuntimeException) {
+       throw (RuntimeException)jjte000;
+     }
+     if (jjte000 instanceof ParseException) {
+       throw (ParseException)jjte000;
+     }
+     throw (Error)jjte000;
+   } finally {
+     if (jjtc000) {
+       jjtree.closeNodeScope(jjtn000, true);
+     }
+   }
 /*@egen*/
 }

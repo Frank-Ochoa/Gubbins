@@ -2,7 +2,7 @@ package ast;
 
 public class TypeFunction implements IASTType
 {
-	// Args will be a TypeArgs, which is a list of types
+	// Args will be a TypeRecord, which is a list of types
 	private IASTType args;
 	private	IASTType result;
 

@@ -3,6 +3,9 @@ PARSER_BEGIN(Gubbins)
 package Gubbins.Parser;
 import ast.*;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class Gubbins
@@ -34,6 +37,7 @@ TOKEN : /* RESERVED WORDS*/
     |   <DO:    "do" >
     |   <FUNC: "func" >
     |   <ARROW: "->">
+    |   <REC:   "rec">
 }
 
 TOKEN : /* TYPES */
@@ -250,12 +254,13 @@ IASTExpr AtomicExpression() :
     Token t;
 }
 {
+    LOOKAHEAD(1)
         t = <INTEGER_LITERAL>   { return new Int(Integer.parseInt(t.image)); }
     |   t = <DOUBLE_LITERAL>    { return new Dble(Double.parseDouble(t.image)); }
     |   t = <IDENTIFIER>        { return new Identifier(t.image); }
     |   <TRUE>                  { return new Bool(true); }
     |   <FALSE>                 { return new Bool(false); }
-    |   e = Array()             { return e; }
+    |     LOOKAHEAD(2) (e = Array() | e = Function() )           { return e;}
 }
 
 IASTStatement Assignment() :
@@ -288,19 +293,52 @@ IASTStatement Assignment() :
    }
 }
 
-IASTType Type() :
+IASTType FunctionType() :
 {
-    List<IASTType> args = new LinkedList<IASTType>();
     IASTType t;
     IASTType result;
 }
 {
-       t = AtomicType()   {return t;}
-     | <TYPE_ARRAY> t = Type()      {return new TypeArray(t);}
-     | <LPAREN> t = Type() {args.add(t);} (<COMMA> t = Type() {args.add(t);})* <RPAREN> {return new TypeArgs(args);}
-     | <FUNC> t = Type() <ARROW> result = Type() {return new TypeFunction(t, result);}
+    result = Type()
+    (
+        <ARROW> t = Type() {return new TypeFunction(result, t);}
+    )*
+
+    {return result;}
+}
+
+IASTType Type() :
+{
+    IASTType t;
+    IASTType result;
+    Token ident;
+    List<IASTType> args = new LinkedList<IASTType>();
+    List<Identifier> idents = new LinkedList<Identifier>();
+    Map<Identifier, IASTType> record = new HashMap<Identifier, IASTType>();
+
 
 }
+{
+
+
+
+       t = AtomicType()   {return t;}
+     | <TYPE_ARRAY> t = Type()      {return new TypeArray(t);}
+     | <LPAREN> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));}
+     (<COMMA> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));})* <RPAREN>
+     {
+
+     Iterator<Identifier> it1 = idents.iterator();
+     Iterator<IASTType> it2 = args.iterator();
+     while(it1.hasNext() && it2.hasNext())
+     {
+        record.put(it1.next(), it2.next());
+     }
+
+     return new TypeRecord(record);
+     }
+}
+
 
 IASTType AtomicType() :
 {
@@ -352,26 +390,31 @@ If If() :
     {return new If(condt, stmts);}
 }
 
+Record Record() :
+{
+    IASTType type;
+    // Can compute the type of the record based on whats in there
+    // int a := 12, int b := 15; etc
+}
+{
+    <REC> <LPAREN>
+}
+
 Function Function() :
 {
     IASTType def;
-    Token t;
     List<IASTStatement> stmts;
-    List<IASTExpr> idents = new LinkedList<IASTExpr>();
 }
 {
-    def = Type()
-    <LPAREN>
-    t = <IDENTIFIER> {idents.add(new Identifier(t.image));} (<COMMA> t = <IDENTIFIER> {idents.add(new Identifier(t.image));})*
-    <RPAREN>
-    <LBRACK>
+   <FUNC> def = FunctionType()
+    <LCURLY>
         stmts = Statements()
-    <RBRACK>
+    <RCURLY>
 
-    {return new Function(def, idents, stmts);}
+    {return new Function(def, stmts);}
 }
 
-// Could do AtomicType() <IDENT>, then return a hashmap of them
+// Could do AtomicType() <IDENT>, then return a hashmap of them, so a record would be hashmap from ident -> type
 
 
 

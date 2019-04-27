@@ -26,8 +26,21 @@ public class NTypeFunction implements IType
 		// Because could have an array of functions??? lol
 	}
 
+	@Override public boolean equals(Object obj)
+	{
+		if (!(obj instanceof NTypeFunction))
+		{
+			return false;
+		}
+
+		NTypeFunction func = (NTypeFunction) obj;
+
+		return (this.args.equals(func.getArgs()) && this.result.equals(func.getResult()));
+	}
+
 	@Override public void visit(ITypeVisitor visitor)
 	{
 		visitor.visit(this);
 	}
+
 }

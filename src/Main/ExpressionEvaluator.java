@@ -248,4 +248,15 @@ public class ExpressionEvaluator implements INExprVisitor
 		}
 
 	}
+
+	@Override public void visit(NRecord a)
+	{
+		// A record is hashmap from ident to value??
+		// How to evaluate a record?? A record is a list of declarations currently
+	}
+
+	@Override public void visit(NFunction a)
+	{
+		 ret(null);
+	}
 }

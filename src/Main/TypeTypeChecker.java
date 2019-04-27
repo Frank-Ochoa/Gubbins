@@ -2,10 +2,9 @@ package Main;
 
 import ast.*;
 import ntree.*;
+import types.TypeException;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class TypeTypeChecker implements IASTTypeVisitor, ITypeVisitor
 {
@@ -67,21 +66,34 @@ public class TypeTypeChecker implements IASTTypeVisitor, ITypeVisitor
 
 	@Override public void visit(TypeFunction a)
 	{
-		NTypeArgs args = (NTypeArgs) tcheck(a.getArgs());
+		// All I need to know here is that the lhs is a record
+		// and that the rhs is a kind of type
+
+		// Make sure that the left side is a type record
+		IType record = tcheck(a.getArgs());
+		if(!(record instanceof TypeRecord))
+		{
+			throw new TypeException("BAD FUNCTION");
+		}
+
+		// Rhs can be type anything? I think, maybe not function, but probably
 		IType returnType = tcheck(a.getResult());
 
-		ret(new NTypeFunction(args, returnType));
+		ret(new NTypeFunction(record, returnType));
 	}
 
-	@Override public void visit(TypeArgs a)
+	@Override public void visit(TypeRecord a)
 	{
-		List<IType> nArgs = new LinkedList<>();
-		// Normalize the list of types
-		for(IASTType type : a.getArgs())
+		List<NIdentifier> args = new LinkedList<>();
+		for(Map.Entry<Identifier, IASTType> entry : a.getArgs().entrySet())
 		{
-			nArgs.add(tcheck(type));
+			String name = entry.getKey().getName();
+			IType type = typecheck(entry.getValue());
+
+			args.add(new NIdentifier(name, type));
 		}
-		ret(new NTypeArgs(nArgs));
+
+		ret(new NTypeRecord(args));
 	}
 
 	public void visit(NTypeArray a)
@@ -106,11 +118,11 @@ public class TypeTypeChecker implements IASTTypeVisitor, ITypeVisitor
 
 	@Override public void visit(NTypeFunction a)
 	{
-
+		ret(a);
 	}
 
-	@Override public void visit(NTypeArgs a)
+	@Override public void visit(NTypeRecord a)
 	{
-
+		ret(a);
 	}
 }

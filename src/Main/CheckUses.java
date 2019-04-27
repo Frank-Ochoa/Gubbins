@@ -46,6 +46,11 @@ public class CheckUses implements IASTExpressionVisitor
 
 	}
 
+	@Override public void visit(Function a)
+	{
+
+	}
+
 	@Override
     public void visit(Int a)
     {
@@ -89,6 +94,11 @@ public class CheckUses implements IASTExpressionVisitor
 	}
 
 	@Override public void visit(GreaterThan a)
+	{
+
+	}
+
+	@Override public void visit(Record a)
 	{
 
 	}

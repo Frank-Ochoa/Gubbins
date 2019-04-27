@@ -12,5 +12,5 @@ public interface IASTTypeVisitor
 
 	void visit(TypeFunction a);
 
-	void visit(TypeArgs a);
+	void visit(TypeRecord a);
 }
