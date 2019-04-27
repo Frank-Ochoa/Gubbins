@@ -6,31 +6,35 @@ public interface GubbinsTreeConstants
   public int JJTINPUT = 0;
   public int JJTSTATEMENT = 1;
   public int JJTSTATEMENTS = 2;
-  public int JJTWHILELOOP = 3;
-  public int JJTFORLOOP = 4;
-  public int JJTPRINT = 5;
-  public int JJTEXPRESSION = 6;
-  public int JJTCONDITIONALEXPRESSION = 7;
-  public int JJTADDITIVEEXPRESSION = 8;
-  public int JJTMULTIPLICATIVEEXPRESSION = 9;
-  public int JJTARRAYINDEXEXPRESSION = 10;
-  public int JJTATOMICEXPRESSION = 11;
-  public int JJTASSIGNMENT = 12;
-  public int JJTFUNCTIONTYPE = 13;
-  public int JJTTYPE = 14;
-  public int JJTATOMICTYPE = 15;
-  public int JJTARRAY = 16;
-  public int JJTDOWHILELOOP = 17;
-  public int JJTIF = 18;
-  public int JJTRECORD = 19;
-  public int JJTFUNCTION = 20;
-  public int JJTRETURN = 21;
+  public int JJTFUNCTIONSTATEMENT = 3;
+  public int JJTFUNCTIONSTATEMENTS = 4;
+  public int JJTWHILELOOP = 5;
+  public int JJTFORLOOP = 6;
+  public int JJTPRINT = 7;
+  public int JJTEXPRESSION = 8;
+  public int JJTCONDITIONALEXPRESSION = 9;
+  public int JJTADDITIVEEXPRESSION = 10;
+  public int JJTMULTIPLICATIVEEXPRESSION = 11;
+  public int JJTARRAYINDEXEXPRESSION = 12;
+  public int JJTATOMICEXPRESSION = 13;
+  public int JJTASSIGNMENT = 14;
+  public int JJTFUNCTIONTYPE = 15;
+  public int JJTTYPE = 16;
+  public int JJTATOMICTYPE = 17;
+  public int JJTARRAY = 18;
+  public int JJTDOWHILELOOP = 19;
+  public int JJTIF = 20;
+  public int JJTRECORD = 21;
+  public int JJTFUNCTION = 22;
+  public int JJTRETURN = 23;
 
 
   public String[] jjtNodeName = {
     "Input",
     "Statement",
     "Statements",
+    "FunctionStatement",
+    "FunctionStatements",
     "WhileLoop",
     "ForLoop",
     "Print",
@@ -52,4 +56,4 @@ public interface GubbinsTreeConstants
     "Return",
   };
 }
-/* JavaCC - OriginalChecksum=65481cc74dc0399276c2f224a61d0ae9 (do not edit this line) */
+/* JavaCC - OriginalChecksum=9be57fb8cb37e1f52a2ed61b1d28aa4b (do not edit this line) */

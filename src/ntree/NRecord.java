@@ -4,15 +4,15 @@ import java.util.List;
 
 public class NRecord extends Expr
 {
-	private List<NAssignment> elements;
+	private List<INStatement> elements;
 
-	public NRecord(IType type, List<NAssignment> elements)
+	public NRecord(IType type, List<INStatement> elements)
 	{
 		super(type);
 		this.elements = elements;
 	}
 
-	public List<NAssignment> getArgs()
+	public List<INStatement> getArgs()
 	{
 		return elements;
 	}

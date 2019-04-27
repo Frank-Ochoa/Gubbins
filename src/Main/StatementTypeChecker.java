@@ -57,8 +57,6 @@ public class StatementTypeChecker implements IASTStatementVisitor
 			throw new TypeException("You big dummy, you can't declare an array like that");
 		}
 
-		// Remember to check that they cant do int x[1];
-
 		typeEnvironment.declare(a.getRhs().getName(), type);
 
 		NIdentifier identifier = (NIdentifier) exprTypeCheck.typecheck(a.getRhs());
@@ -326,6 +324,12 @@ public class StatementTypeChecker implements IASTStatementVisitor
 	{
 		INExpr expr = exprTypeCheck.typecheck(a.getExpr());
 		ret(new NPrint(expr));
+	}
+
+	@Override public void visit(Return a)
+	{
+		INExpr expr = exprTypeCheck.typecheck(a.getExpr());
+		ret(new NReturn(expr));
 	}
 
 	private INExpr promote(INExpr node)

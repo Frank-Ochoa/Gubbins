@@ -121,6 +121,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 	@Override public void visit(Function a)
 	{
+
 		boolean returnThere = false;
 		boolean returnTypeGood = true;
 		// Possibly needs a new scope
@@ -131,6 +132,9 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		{
 			throw new TypeException("NOT A TYPE FUNCTION");
 		}
+
+		// Enter new scope here?
+		typeEnvironment.enterNewScope();
 
 		StatementTypeChecker statementTypeChecker = new StatementTypeChecker(typeEnvironment);
 		List<INStatement> nStmts = new LinkedList<>();
@@ -156,6 +160,8 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 			nStmts.add(nStmt);
 		}
 
+		typeEnvironment.exitScope();
+
 		if(!returnThere)
 		{
 			throw new TypeException("NO RETURN STATEMENT GIVEN");
@@ -172,10 +178,34 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 	@Override public void visit(Record a)
 	{
-		//Possibly needs a new scope
-		// Couldn't a record type also just be declarations? Think about later
+		// What to type check about a record?
+		List<INStatement> nElements = new LinkedList<>();
+		List<NIdentifier> nIdentifiers = new LinkedList<>();
 
+		// Enter new scope here?
+		typeEnvironment.enterNewScope();
+		StatementTypeChecker statementTypeChecker = new StatementTypeChecker(typeEnvironment);
 
+		// Each stmt is guaranteed to be an Assignment, a declare, or declare%assign by the grammar
+		// Also compute the type of the record here
+		for(IASTStatement stmt : a.getElements())
+		{
+			INStatement nElement = statementTypeChecker.typecheck(stmt);
+
+			// Compute the type of the record
+			if(nElement instanceof NDeclaration)
+			{
+				nIdentifiers.add(((NDeclaration) nElement).getRhs());
+			}
+			else if (nElement instanceof NDeclareAssign)
+			{
+				nIdentifiers.add(((NDeclareAssign) nElement).getIdentifier());
+			}
+
+			nElements.add(nElement);
+		}
+
+		ret(new NRecord(new NTypeRecord(nIdentifiers), nElements));
 
 	}
 

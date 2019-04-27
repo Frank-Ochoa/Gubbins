@@ -258,6 +258,124 @@ List<IASTStatement> Statements() :
 /*@egen*/
 }
 
+IASTStatement FunctionStatement() :
+{/*@bgen(jjtree) FunctionStatement */
+    SimpleNode jjtn000 = new SimpleNode(JJTFUNCTIONSTATEMENT);
+    boolean jjtc000 = true;
+    jjtree.openNodeScope(jjtn000);
+/*@egen*/
+    IASTStatement s;
+}
+{/*@bgen(jjtree) FunctionStatement */
+    try {
+/*@egen*/
+    LOOKAHEAD(2)
+
+	        s = Assignment()  <SEMI>/*@bgen(jjtree)*/
+                                          {
+                                            jjtree.closeNodeScope(jjtn000, true);
+                                            jjtc000 = false;
+                                          }
+/*@egen*/  { return s; }
+            |   <PRINT> s = Print() <SEMI>/*@bgen(jjtree)*/
+                                                    {
+                                                      jjtree.closeNodeScope(jjtn000, true);
+                                                      jjtc000 = false;
+                                                    }
+/*@egen*/          { return s; }
+            |   s = DoWhileLoop()/*@bgen(jjtree)*/
+                                             {
+                                               jjtree.closeNodeScope(jjtn000, true);
+                                               jjtc000 = false;
+                                             }
+/*@egen*/            { return s; }
+            |   s = ForLoop()/*@bgen(jjtree)*/
+                                           {
+                                             jjtree.closeNodeScope(jjtn000, true);
+                                             jjtc000 = false;
+                                           }
+/*@egen*/              { return s; }
+            |   s = WhileLoop()/*@bgen(jjtree)*/
+                                        {
+                                          jjtree.closeNodeScope(jjtn000, true);
+                                          jjtc000 = false;
+                                        }
+/*@egen*/         { return s; }
+            |   s = If()/*@bgen(jjtree)*/
+                                        {
+                                          jjtree.closeNodeScope(jjtn000, true);
+                                          jjtc000 = false;
+                                        }
+/*@egen*/                { return s; }
+            |   s = Return()/*@bgen(jjtree)*/
+                                        {
+                                          jjtree.closeNodeScope(jjtn000, true);
+                                          jjtc000 = false;
+                                        }
+/*@egen*/            {return s; }/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
+/*@egen*/
+}
+
+List<IASTStatement> FunctionStatements() :
+{/*@bgen(jjtree) FunctionStatements */
+    SimpleNode jjtn000 = new SimpleNode(JJTFUNCTIONSTATEMENTS);
+    boolean jjtc000 = true;
+    jjtree.openNodeScope(jjtn000);
+/*@egen*/
+    IASTStatement s;
+    LinkedList<IASTStatement> result = new LinkedList<IASTStatement>();
+}
+{/*@bgen(jjtree) FunctionStatements */
+    try {
+/*@egen*/
+    (s = FunctionStatement() { result.add(s); })+/*@bgen(jjtree)*/
+    {
+      jjtree.closeNodeScope(jjtn000, true);
+      jjtc000 = false;
+    }
+/*@egen*/
+    { return result; }/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
+/*@egen*/
+}
+
 While WhileLoop() :
 {/*@bgen(jjtree) WhileLoop */
     SimpleNode jjtn000 = new SimpleNode(JJTWHILELOOP);
@@ -1121,7 +1239,7 @@ Function Function() :
 /*@egen*/
    <FUNC> def = FunctionType()
     <LCURLY>
-        stmts = Statements()
+        stmts = FunctionStatements()
     <RCURLY>/*@bgen(jjtree)*/
     {
       jjtree.closeNodeScope(jjtn000, true);
@@ -1154,18 +1272,40 @@ Function Function() :
 
 Return Return() :
 {/*@bgen(jjtree) Return */
-  SimpleNode jjtn000 = new SimpleNode(JJTRETURN);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+   SimpleNode jjtn000 = new SimpleNode(JJTRETURN);
+   boolean jjtc000 = true;
+   jjtree.openNodeScope(jjtn000);
 /*@egen*/
     // Every function needs to have a return statement, at least one, that matches the functions
     // return type, so that's where I get the return type from
-   // What is this though? A return
+   // What is this though? A return key word followed by an expression
+   IASTExpr expr;
 }
 {/*@bgen(jjtree) Return */
    try {
 /*@egen*/
-   <RETURN>/*@bgen(jjtree)*/
+   <RETURN> expr = Expression()/*@bgen(jjtree)*/
+   {
+     jjtree.closeNodeScope(jjtn000, true);
+     jjtc000 = false;
+   }
+/*@egen*/
+
+   {return new Return(expr);}/*@bgen(jjtree)*/
+   } catch (Throwable jjte000) {
+     if (jjtc000) {
+       jjtree.clearNodeScope(jjtn000);
+       jjtc000 = false;
+     } else {
+       jjtree.popNode();
+     }
+     if (jjte000 instanceof RuntimeException) {
+       throw (RuntimeException)jjte000;
+     }
+     if (jjte000 instanceof ParseException) {
+       throw (ParseException)jjte000;
+     }
+     throw (Error)jjte000;
    } finally {
      if (jjtc000) {
        jjtree.closeNodeScope(jjtn000, true);

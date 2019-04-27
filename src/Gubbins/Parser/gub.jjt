@@ -126,8 +126,6 @@ IASTStatement Statement() :
             |   s = If()                { return s; }
 }
 
-IASTStatement FunctionStatement() :
-
 List<IASTStatement> Statements() :
 {
     IASTStatement s;
@@ -135,6 +133,32 @@ List<IASTStatement> Statements() :
 }
 {
     (s = Statement() { result.add(s); })+
+    { return result; }
+}
+
+IASTStatement FunctionStatement() :
+{
+    IASTStatement s;
+}
+{
+    LOOKAHEAD(2)
+
+	        s = Assignment()  <SEMI>  { return s; }
+            |   <PRINT> s = Print() <SEMI>          { return s; }
+            |   s = DoWhileLoop()            { return s; }
+            |   s = ForLoop()              { return s; }
+            |   s = WhileLoop()         { return s; }
+            |   s = If()                { return s; }
+            |   s = Return()            {return s; }
+}
+
+List<IASTStatement> FunctionStatements() :
+{
+    IASTStatement s;
+    LinkedList<IASTStatement> result = new LinkedList<IASTStatement>();
+}
+{
+    (s = FunctionStatement() { result.add(s); })+
     { return result; }
 }
 
@@ -413,7 +437,7 @@ Function Function() :
 {
    <FUNC> def = FunctionType()
     <LCURLY>
-        stmts = Statements()
+        stmts = FunctionStatements()
     <RCURLY>
 
     {return new Function(def, stmts);}
