@@ -10,4 +10,5 @@ public interface IASTStatementVisitor
 	void visit (DeclareAssign a);
 	void visit (If a);
 	void visit (Print a);
+	void visit (Return a);
 }

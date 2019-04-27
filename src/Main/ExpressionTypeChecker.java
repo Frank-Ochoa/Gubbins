@@ -121,6 +121,8 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 	@Override public void visit(Function a)
 	{
+		boolean returnThere = false;
+		boolean returnTypeGood = true;
 		// Possibly needs a new scope
 		TypeTypeChecker t = new TypeTypeChecker();
 		// Need to make sure this is a TypeFunction
@@ -130,13 +132,50 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 			throw new TypeException("NOT A TYPE FUNCTION");
 		}
 
+		StatementTypeChecker statementTypeChecker = new StatementTypeChecker(typeEnvironment);
+		List<INStatement> nStmts = new LinkedList<>();
 
+		for(IASTStatement stmt : a.getBody())
+		{
+			// For making sure there is at least one return stmt, will still also need to make
+			// that each is of the return type found in the functionType
+
+			INStatement nStmt = statementTypeChecker.typecheck(stmt);
+
+			if(nStmt instanceof NReturn)
+			{
+				// This boolean might be redundant
+				returnThere = true;
+
+				if(!(((NReturn) nStmt).getExpr().getType().equals(((NTypeFunction) functionType).getResult())))
+				{
+					returnTypeGood = false;
+				}
+			}
+
+			nStmts.add(nStmt);
+		}
+
+		if(!returnThere)
+		{
+			throw new TypeException("NO RETURN STATEMENT GIVEN");
+		}
+
+		if(!returnTypeGood)
+		{
+			throw new TypeException("AT LEAST ONE RETURN TYPE DOES NOT MATCH FUNCTION RETURN TYPE");
+		}
+
+		ret(new NFunction(functionType, nStmts));
 
 	}
 
 	@Override public void visit(Record a)
 	{
 		//Possibly needs a new scope
+		// Couldn't a record type also just be declarations? Think about later
+
+
 
 	}
 

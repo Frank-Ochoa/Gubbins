@@ -24,6 +24,7 @@ public interface GubbinsTreeConstants
   public int JJTIF = 18;
   public int JJTRECORD = 19;
   public int JJTFUNCTION = 20;
+  public int JJTRETURN = 21;
 
 
   public String[] jjtNodeName = {
@@ -48,6 +49,7 @@ public interface GubbinsTreeConstants
     "If",
     "Record",
     "Function",
+    "Return",
   };
 }
-/* JavaCC - OriginalChecksum=c285025f73c2385311469f9967c9786d (do not edit this line) */
+/* JavaCC - OriginalChecksum=65481cc74dc0399276c2f224a61d0ae9 (do not edit this line) */

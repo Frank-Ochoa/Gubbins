@@ -38,6 +38,7 @@ TOKEN : /* RESERVED WORDS*/
     |   <FUNC: "func" >
     |   <ARROW: "->">
     |   <REC:   "rec">
+    |   <RETURN: "return">
 }
 
 TOKEN : /* TYPES */
@@ -124,6 +125,8 @@ IASTStatement Statement() :
             |   s = WhileLoop()         { return s; }
             |   s = If()                { return s; }
 }
+
+IASTStatement FunctionStatement() :
 
 List<IASTStatement> Statements() :
 {
@@ -260,7 +263,9 @@ IASTExpr AtomicExpression() :
     |   t = <IDENTIFIER>        { return new Identifier(t.image); }
     |   <TRUE>                  { return new Bool(true); }
     |   <FALSE>                 { return new Bool(false); }
-    |     LOOKAHEAD(2) (e = Array() | e = Function() )           { return e;}
+    |  e = Array()              { return e; }
+    |  e = Function()           { return e; }
+    |  e = Record()             { return e; }
 }
 
 IASTStatement Assignment() :
@@ -310,13 +315,6 @@ IASTType FunctionType() :
 IASTType Type() :
 {
     IASTType t;
-    IASTType result;
-    Token ident;
-    List<IASTType> args = new LinkedList<IASTType>();
-    List<Identifier> idents = new LinkedList<Identifier>();
-    Map<Identifier, IASTType> record = new HashMap<Identifier, IASTType>();
-
-
 }
 {
 
@@ -324,29 +322,34 @@ IASTType Type() :
 
        t = AtomicType()   {return t;}
      | <TYPE_ARRAY> t = Type()      {return new TypeArray(t);}
-     | <LPAREN> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));}
-     (<COMMA> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));})* <RPAREN>
-     {
-
-     Iterator<Identifier> it1 = idents.iterator();
-     Iterator<IASTType> it2 = args.iterator();
-     while(it1.hasNext() && it2.hasNext())
-     {
-        record.put(it1.next(), it2.next());
-     }
-
-     return new TypeRecord(record);
-     }
 }
 
 
 IASTType AtomicType() :
 {
+     IASTType t;
+     Token ident;
+     List<IASTType> args = new LinkedList<IASTType>();
+     List<Identifier> idents = new LinkedList<Identifier>();
+     Map<Identifier, IASTType> record = new HashMap<Identifier, IASTType>();
 }
 {
          <TYPE_INT>               {return TypeInt.INT;}
     |    <TYPE_DOUBLE>            {return TypeDouble.DOUBLE;}
     |    <TYPE_BOOLEAN>           {return TypeBoolean.BOOLEAN;}
+    | <LPAREN> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));}
+         (<COMMA> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));})* <RPAREN>
+         {
+
+         Iterator<Identifier> it1 = idents.iterator();
+         Iterator<IASTType> it2 = args.iterator();
+         while(it1.hasNext() && it2.hasNext())
+         {
+            record.put(it1.next(), it2.next());
+         }
+
+         return new TypeRecord(record);
+         }
 }
 
 // Do this as an assignment
@@ -392,12 +395,14 @@ If If() :
 
 Record Record() :
 {
-    IASTType type;
     // Can compute the type of the record based on whats in there
     // int a := 12, int b := 15; etc
+    List<IASTStatement> assigns = new LinkedList<IASTStatement>();
+    IASTStatement stmt;
 }
 {
-    <REC> <LPAREN>
+    <REC> <LPAREN> stmt = Assignment() {assigns.add(stmt);} (stmt = Assignment() {assignts.add(stmt);})* <RPAREN>
+    {return new Record(assigns);}
 }
 
 Function Function() :
@@ -412,6 +417,19 @@ Function Function() :
     <RCURLY>
 
     {return new Function(def, stmts);}
+}
+
+Return Return() :
+{
+    // Every function needs to have a return statement, at least one, that matches the functions
+    // return type, so that's where I get the return type from
+   // What is this though? A return key word followed by an expression
+   IASTExpr expr;
+}
+{
+   <RETURN> expr = Expression()
+
+   {return new Return(expr);}
 }
 
 // Could do AtomicType() <IDENT>, then return a hashmap of them, so a record would be hashmap from ident -> type

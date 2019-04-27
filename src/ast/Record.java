@@ -1,27 +1,23 @@
 package ast;
 
-import java.util.Map;
+import java.util.List;
 
 public class Record implements IASTExpr
 {
-	private IASTType type;
-	private Map<Identifier, IASTType> args;
+	private List<IASTStatement> elements;
 
-	public Record(IASTType type, Map<Identifier, IASTType> args)
+	public Record(List<IASTStatement> elements)
 	{
-		this.type = type;
-		this.args = args;
+		this.elements = elements;
 	}
 
-	public IASTType getType()
+	public List<IASTStatement> getElements()
 	{
-		return type;
+		return elements;
 	}
 
-	public Map<Identifier, IASTType> getArgs()
-	{
-		return args;
-	}
+	// Compute type of records based on its assignments, maybe in the N version
+
 
 	@Override public void visit(IASTExpressionVisitor visitor)
 	{

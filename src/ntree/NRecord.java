@@ -4,17 +4,17 @@ import java.util.List;
 
 public class NRecord extends Expr
 {
-	private List<NAssignment> args;
+	private List<NAssignment> elements;
 
-	public NRecord(IType type, List<NAssignment> args)
+	public NRecord(IType type, List<NAssignment> elements)
 	{
 		super(type);
-		this.args = args;
+		this.elements = elements;
 	}
 
 	public List<NAssignment> getArgs()
 	{
-		return args;
+		return elements;
 	}
 
 	@Override public void visit(INExprVisitor visitor)

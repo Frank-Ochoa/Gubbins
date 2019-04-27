@@ -42,6 +42,7 @@ TOKEN : /* RESERVED WORDS*/
     |   <FUNC: "func" >
     |   <ARROW: "->">
     |   <REC:   "rec">
+    |   <RETURN: "return">
 }
 
 TOKEN : /* TYPES */
@@ -661,12 +662,24 @@ IASTExpr AtomicExpression() :
                                   jjtc000 = false;
                                 }
 /*@egen*/                 { return new Bool(false); }
-    |     LOOKAHEAD(2) (e = Array() | e = Function() )/*@bgen(jjtree)*/
-                                                                 {
-                                                                   jjtree.closeNodeScope(jjtn000, true);
-                                                                   jjtc000 = false;
-                                                                 }
-/*@egen*/           { return e;}/*@bgen(jjtree)*/
+    |  e = Array()/*@bgen(jjtree)*/
+                                {
+                                  jjtree.closeNodeScope(jjtn000, true);
+                                  jjtc000 = false;
+                                }
+/*@egen*/              { return e; }
+    |  e = Function()/*@bgen(jjtree)*/
+                                {
+                                  jjtree.closeNodeScope(jjtn000, true);
+                                  jjtc000 = false;
+                                }
+/*@egen*/           { return e; }
+    |  e = Record()/*@bgen(jjtree)*/
+                                {
+                                  jjtree.closeNodeScope(jjtn000, true);
+                                  jjtc000 = false;
+                                }
+/*@egen*/             { return e; }/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -802,13 +815,6 @@ IASTType Type() :
     jjtree.openNodeScope(jjtn000);
 /*@egen*/
     IASTType t;
-    IASTType result;
-    Token ident;
-    List<IASTType> args = new LinkedList<IASTType>();
-    List<Identifier> idents = new LinkedList<Identifier>();
-    Map<Identifier, IASTType> record = new HashMap<Identifier, IASTType>();
-
-
 }
 {/*@bgen(jjtree) Type */
        try {
@@ -827,25 +833,7 @@ IASTType Type() :
                                       jjtree.closeNodeScope(jjtn000, true);
                                       jjtc000 = false;
                                     }
-/*@egen*/      {return new TypeArray(t);}
-     | <LPAREN> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));}
-     (<COMMA> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));})* <RPAREN>/*@bgen(jjtree)*/
-     {
-       jjtree.closeNodeScope(jjtn000, true);
-       jjtc000 = false;
-     }
-/*@egen*/
-     {
-
-     Iterator<Identifier> it1 = idents.iterator();
-     Iterator<IASTType> it2 = args.iterator();
-     while(it1.hasNext() && it2.hasNext())
-     {
-        record.put(it1.next(), it2.next());
-     }
-
-     return new TypeRecord(record);
-     }/*@bgen(jjtree)*/
+/*@egen*/      {return new TypeArray(t);}/*@bgen(jjtree)*/
        } catch (Throwable jjte000) {
          if (jjtc000) {
            jjtree.clearNodeScope(jjtn000);
@@ -871,10 +859,15 @@ IASTType Type() :
 
 IASTType AtomicType() :
 {/*@bgen(jjtree) AtomicType */
-  SimpleNode jjtn000 = new SimpleNode(JJTATOMICTYPE);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+     SimpleNode jjtn000 = new SimpleNode(JJTATOMICTYPE);
+     boolean jjtc000 = true;
+     jjtree.openNodeScope(jjtn000);
 /*@egen*/
+     IASTType t;
+     Token ident;
+     List<IASTType> args = new LinkedList<IASTType>();
+     List<Identifier> idents = new LinkedList<Identifier>();
+     Map<Identifier, IASTType> record = new HashMap<Identifier, IASTType>();
 }
 {/*@bgen(jjtree) AtomicType */
          try {
@@ -896,7 +889,39 @@ IASTType AtomicType() :
                                     jjtree.closeNodeScope(jjtn000, true);
                                     jjtc000 = false;
                                   }
-/*@egen*/           {return TypeBoolean.BOOLEAN;}/*@bgen(jjtree)*/
+/*@egen*/           {return TypeBoolean.BOOLEAN;}
+    | <LPAREN> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));}
+         (<COMMA> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));})* <RPAREN>/*@bgen(jjtree)*/
+         {
+           jjtree.closeNodeScope(jjtn000, true);
+           jjtc000 = false;
+         }
+/*@egen*/
+         {
+
+         Iterator<Identifier> it1 = idents.iterator();
+         Iterator<IASTType> it2 = args.iterator();
+         while(it1.hasNext() && it2.hasNext())
+         {
+            record.put(it1.next(), it2.next());
+         }
+
+         return new TypeRecord(record);
+         }/*@bgen(jjtree)*/
+         } catch (Throwable jjte000) {
+           if (jjtc000) {
+             jjtree.clearNodeScope(jjtn000);
+             jjtc000 = false;
+           } else {
+             jjtree.popNode();
+           }
+           if (jjte000 instanceof RuntimeException) {
+             throw (RuntimeException)jjte000;
+           }
+           if (jjte000 instanceof ParseException) {
+             throw (ParseException)jjte000;
+           }
+           throw (Error)jjte000;
          } finally {
            if (jjtc000) {
              jjtree.closeNodeScope(jjtn000, true);
@@ -1045,12 +1070,21 @@ Record Record() :
     boolean jjtc000 = true;
     jjtree.openNodeScope(jjtn000);
 /*@egen*/
-    IASTType type;
+    // Can compute the type of the record based on whats in there
+    // int a := 12, int b := 15; etc
+    List<IASTStatement> assigns = new LinkedList<IASTStatement>();
+    IASTStatement stmt;
 }
 {/*@bgen(jjtree) Record */
     try {
 /*@egen*/
-    <REC> type = Type()/*@bgen(jjtree)*/
+    <REC> <LPAREN> stmt = Assignment() {assigns.add(stmt);} (stmt = Assignment() {assignts.add(stmt);})* <RPAREN>/*@bgen(jjtree)*/
+    {
+      jjtree.closeNodeScope(jjtn000, true);
+      jjtc000 = false;
+    }
+/*@egen*/
+    {return new Record(assigns);}/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -1110,6 +1144,28 @@ Function Function() :
        throw (ParseException)jjte000;
      }
      throw (Error)jjte000;
+   } finally {
+     if (jjtc000) {
+       jjtree.closeNodeScope(jjtn000, true);
+     }
+   }
+/*@egen*/
+}
+
+Return Return() :
+{/*@bgen(jjtree) Return */
+  SimpleNode jjtn000 = new SimpleNode(JJTRETURN);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/
+    // Every function needs to have a return statement, at least one, that matches the functions
+    // return type, so that's where I get the return type from
+   // What is this though? A return
+}
+{/*@bgen(jjtree) Return */
+   try {
+/*@egen*/
+   <RETURN>/*@bgen(jjtree)*/
    } finally {
      if (jjtc000) {
        jjtree.closeNodeScope(jjtn000, true);

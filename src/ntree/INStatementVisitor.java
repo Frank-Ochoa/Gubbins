@@ -8,4 +8,5 @@ public interface INStatementVisitor
 	void visit(NIf a);
 	void visit(NPrint a);
 	void visit(NWhile a);
+	void visit(NReturn a);
 }
