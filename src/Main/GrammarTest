@@ -1,5 +1,7 @@
 arr int array := arr int (10);
 
+int testint := 4;
+
 array[0] := 9;
 array[1] := 2;
 array[2] := 4;
@@ -29,9 +31,10 @@ for i in range arrayLength
 
 print array;
 
-rec a := (int x, int y, int z);
+(int a, int b) a := rec (int a, int b);
 
-func function := def (int x, int y, int z) -> int
+(int a, int b) -> bool p := func (int a, int b) -> bool
 {
-    print x;
+   int a := 12;
+   return true;
 };

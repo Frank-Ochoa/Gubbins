@@ -249,14 +249,23 @@ public class ExpressionEvaluator implements INExprVisitor
 
 	}
 
+
+
 	@Override public void visit(NRecord a)
 	{
-		// A record is hashmap from ident to value??
-		// How to evaluate a record?? A record is a list of declarations currently
+		typeEnviroment.enterNewScope();
+		// Possibly hashmap of values? Where a record index expression then does a look up on that hashmap
+		StatementEvaluator sEval = new StatementEvaluator(typeEnviroment);
+		sEval.eval(a.getArgs());
+
+		ret(null);
+		typeEnviroment.exitScope();
 	}
 
 	@Override public void visit(NFunction a)
 	{
+		typeEnviroment.enterNewScope();
 		 ret(null);
+		 typeEnviroment.exitScope();
 	}
 }

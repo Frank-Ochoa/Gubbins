@@ -4,7 +4,7 @@ package Gubbins.Parser;
 import ast.*;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -149,7 +149,7 @@ IASTStatement FunctionStatement() :
             |   s = ForLoop()              { return s; }
             |   s = WhileLoop()         { return s; }
             |   s = If()                { return s; }
-            |   s = Return()            {return s; }
+            |   s = Return() <SEMI>            {return s; }
 }
 
 List<IASTStatement> FunctionStatements() :
@@ -301,7 +301,7 @@ IASTStatement Assignment() :
     IASTExpr e = null;
 }
 {
-   (x = Type())? t = <IDENTIFIER> (<LBRACK> index = Expression() <RBRACK> { indices.add(index); })*  (<ASSIGN_EQUALS> e = Expression())?
+   (x = FunctionType())? t = <IDENTIFIER> (<LBRACK> index = Expression() <RBRACK> { indices.add(index); })*  (<ASSIGN_EQUALS> e = Expression())?
    {
      if(x == null && e == null)
      {
@@ -341,10 +341,7 @@ IASTType Type() :
     IASTType t;
 }
 {
-
-
-
-       t = AtomicType()   {return t;}
+     t = AtomicType()   {return t;}
      | <TYPE_ARRAY> t = Type()      {return new TypeArray(t);}
 }
 
@@ -355,7 +352,7 @@ IASTType AtomicType() :
      Token ident;
      List<IASTType> args = new LinkedList<IASTType>();
      List<Identifier> idents = new LinkedList<Identifier>();
-     Map<Identifier, IASTType> record = new HashMap<Identifier, IASTType>();
+     Map<Identifier, IASTType> record = new LinkedHashMap<Identifier, IASTType>();
 }
 {
          <TYPE_INT>               {return TypeInt.INT;}
@@ -425,7 +422,7 @@ Record Record() :
     IASTStatement stmt;
 }
 {
-    <REC> <LPAREN> stmt = Assignment() {assigns.add(stmt);} (stmt = Assignment() {assignts.add(stmt);})* <RPAREN>
+    <REC> <LPAREN> stmt = Assignment() {assigns.add(stmt);} (<COMMA> stmt = Assignment() {assigns.add(stmt);})* <RPAREN>
     {return new Record(assigns);}
 }
 

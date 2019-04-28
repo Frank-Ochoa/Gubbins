@@ -71,7 +71,7 @@ public class TypeTypeChecker implements IASTTypeVisitor, ITypeVisitor
 
 		// Make sure that the left side is a type record
 		IType record = tcheck(a.getArgs());
-		if(!(record instanceof TypeRecord))
+		if(!(record instanceof NTypeRecord))
 		{
 			throw new TypeException("BAD FUNCTION");
 		}

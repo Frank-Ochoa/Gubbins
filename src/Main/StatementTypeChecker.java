@@ -47,7 +47,10 @@ public class StatementTypeChecker implements IASTStatementVisitor
 		// Make sure grammar does that
 		IType type = typeTypeCheck.typecheck(a.getLhs());
 
-		if (typeEnvironment.lookup(a.getRhs().getName()) != null)
+		// If being declared in a record or function though, only want to look at nearest scope
+		// I don't think I can even get that info right now
+
+		if (typeEnvironment.lookupNearest(a.getRhs().getName()) != null)
 		{
 			throw new TypeException(a.getRhs().getName() + " ALREADY DEFINED IN SCOPE");
 		}
@@ -72,7 +75,7 @@ public class StatementTypeChecker implements IASTStatementVisitor
 
 		// Make sure Iden is not already within scope, look up closet scope, comment this out for
 		// standard lexical analysis
-		if (typeEnvironment.lookup(a.getIden().getName()) != null)
+		if (typeEnvironment.lookupNearest(a.getIden().getName()) != null)
 		{
 			throw new TypeException(a.getIden().getName() + " ALREADY DEFINED IN SCOPE");
 		}

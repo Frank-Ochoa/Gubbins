@@ -47,16 +47,28 @@ public class SymTab<T> implements ISymTab<T>
         return null;
     }
 
+
     @Override
     public void enterNewScope()
     {
         scopes.addFirst(new HashMap<>());
     }
 
+    @Override public T lookupNearest(String name)
+    {
+        T t = scopes.get(0).get(name);
+        return t;
+    }
+
     @Override
     public void exitScope()
     {
         scopes.removeFirst();
+    }
+
+    @Override public int numScopes()
+    {
+        return this.scopes.size();
     }
 
     @Override

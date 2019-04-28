@@ -187,7 +187,6 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		StatementTypeChecker statementTypeChecker = new StatementTypeChecker(typeEnvironment);
 
 		// Each stmt is guaranteed to be an Assignment, a declare, or declare%assign by the grammar
-		// Also compute the type of the record here
 		for(IASTStatement stmt : a.getElements())
 		{
 			INStatement nElement = statementTypeChecker.typecheck(stmt);
@@ -205,8 +204,9 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 			nElements.add(nElement);
 		}
 
-		ret(new NRecord(new NTypeRecord(nIdentifiers), nElements));
+		typeEnvironment.exitScope();
 
+		ret(new NRecord(new NTypeRecord(nIdentifiers), nElements));
 	}
 
 	@Override public void visit(Identifier a)
@@ -226,6 +226,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 	{
 		if (e.getType() != NTypeInt.INT && e.getType() != NTypeDouble.DOUBLE)
 		{
+			System.out.println(e.getType());
 			throw new TypeException("Non numeric arguments");
 			//  type checking error
 		}

@@ -63,7 +63,7 @@ public class NTypeRecord implements IType
 
 		while(it1.hasNext() && it2.hasNext())
 		{
-			if(!it1.next().equals(it2.next()))
+			if(!(it1.next().equals(it2.next())))
 			{
 				return false;
 			}

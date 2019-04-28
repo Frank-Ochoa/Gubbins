@@ -9,6 +9,10 @@ public interface ISymTab<T>
     T lookup(String name);
     
     void enterNewScope();
+
+    T lookupNearest(String name);
     
     void exitScope();
+
+    int numScopes();
 }
