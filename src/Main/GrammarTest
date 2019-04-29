@@ -38,6 +38,6 @@ print recTest;
 
 (int a, int b) -> bool p := func (int a, int b) -> bool
 {
-   int a := 12;
+   a := 12;
    return true;
 };

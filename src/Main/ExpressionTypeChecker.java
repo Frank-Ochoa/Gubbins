@@ -118,13 +118,22 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		TypeTypeChecker t = new TypeTypeChecker();
 		// Need to make sure this is a TypeFunction
 		IType functionType = t.typecheck(a.getTypeFunction());
-		if ((!(functionType instanceof NTypeFunction)))
-		{
-			throw new TypeException("NOT A TYPE FUNCTION");
-		}
 
 		// Enter new scope here?
 		typeEnvironment.enterNewScope();
+
+		if (functionType instanceof NTypeFunction)
+		{
+			NTypeRecord rec =(NTypeRecord) ((NTypeFunction) functionType).getArgs();
+			for(NIdentifier ident : rec.getArgs())
+			{
+				typeEnvironment.declare(ident.getName(), ident.getType());
+			}
+		}
+		else
+		{
+			throw new TypeException("NOT A TYPE FUNCTION");
+		}
 
 		StatementTypeChecker statementTypeChecker = new StatementTypeChecker(typeEnvironment);
 		List<INStatement> nStmts = new LinkedList<>();
