@@ -107,4 +107,9 @@ public class CheckUses implements IASTExpressionVisitor
 	{
 
 	}
+
+	@Override public void visit(FunctionCall a)
+	{
+
+	}
 }

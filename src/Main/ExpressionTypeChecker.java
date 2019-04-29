@@ -6,8 +6,10 @@ import symtab.ISymTab;
 import types.TypeException;
 import types.UndeclaredIdentifer;
 
+import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 public class ExpressionTypeChecker implements IASTExpressionVisitor
@@ -124,10 +126,13 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 		if (functionType instanceof NTypeFunction)
 		{
-			NTypeRecord rec =(NTypeRecord) ((NTypeFunction) functionType).getArgs();
-			for(NIdentifier ident : rec.getArgs())
+			TypeFunction astTF = (TypeFunction) a.getTypeFunction();
+			TypeRecord astTR = (TypeRecord) astTF.getArgs();
+
+			for(Map.Entry<Identifier, IASTType> entry : astTR.getArgs().entrySet())
 			{
-				typeEnvironment.declare(ident.getName(), ident.getType());
+				//System.out.println(entry.getKey().getName() + " : " + entry.getValue());
+				a.getBody().add(0, new Declaration(entry.getValue(), entry.getKey(), new LinkedList<>()));
 			}
 		}
 		else
@@ -224,6 +229,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 				if(ident.getName().equals(index))
 				{
 					recAT = ident.getType();
+					break;
 				}
 			}
 		}
@@ -241,6 +247,11 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		{
 			throw new TypeException("RECORD DOES NOT CONTAIN : " + index);
 		}
+
+	}
+
+	@Override public void visit(FunctionCall a)
+	{
 
 	}
 

@@ -207,6 +207,7 @@ public class StatementTypeChecker implements IASTStatementVisitor
 		{
 			if ((!(lhs.getType().equals(rhs.getType()))))
 			{
+				System.out.println(lhs.getName() + " :: " + lhs.getType());
 				throw new TypeException("Incompatible Given Type to Identifier");
 			}
 		}

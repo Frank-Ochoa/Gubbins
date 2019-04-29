@@ -33,4 +33,6 @@ public interface IASTExpressionVisitor
 
     void visit (RecordAccess a);
 
+    void visit (FunctionCall a);
+
 }

@@ -284,8 +284,18 @@ public class ExpressionEvaluator implements INExprVisitor
 	@Override public void visit(NFunction a)
 	{
 		typeEnviroment.enterNewScope();
-		 ret(null);
-		 typeEnviroment.exitScope();
+
+		// what am I even returning here??? A function? but how?
+		// Possibly the return type?, and then a function has an inner type of return type?
+		// A closure would just be checking if its defined in scope, and if not then getting the
+		// value from outside the scope
+
+		// Oh wait, maybe just return the body of the function and tie that to whatever assigning to
+		// so that a function is called, just assign those values to the args and then eval the body
+
+		ret(a.getBody());
+
+		typeEnviroment.exitScope();
 	}
 
 	@Override public void visit(NRecordAccess a)
