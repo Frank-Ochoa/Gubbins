@@ -31,7 +31,7 @@ for i in range arrayLength
 
 print array;
 
-(int a, int b) a := rec (int a, int b);
+(int a, int b) a := rec (int a = 10, int b = 12);
 
 (int a, int b) -> bool p := func (int a, int b) -> bool
 {

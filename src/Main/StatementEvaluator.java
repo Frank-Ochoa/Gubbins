@@ -18,6 +18,11 @@ public class StatementEvaluator implements INStatementVisitor
 		this.exprEval = new ExpressionEvaluator(evalEnviroment);
 	}
 
+	public ISymTab<Object> getEvalEnviroment()
+	{
+		return evalEnviroment;
+	}
+
 	public void eval(INStatement e)
 	{
 		e.visit(this);

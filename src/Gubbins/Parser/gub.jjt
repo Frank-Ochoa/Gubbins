@@ -250,6 +250,10 @@ IASTExpr MultiplicativeExpression() :
     { return result; }
 }
 
+IASTExpr RecordAcessExprssion
+{
+}
+
 IASTExpr ArrayIndexExpression() :
 {
     IASTExpr result;

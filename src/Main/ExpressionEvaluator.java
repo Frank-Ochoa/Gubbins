@@ -3,9 +3,7 @@ package Main;
 import ntree.*;
 import symtab.ISymTab;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class ExpressionEvaluator implements INExprVisitor
 {
@@ -255,11 +253,38 @@ public class ExpressionEvaluator implements INExprVisitor
 	{
 		typeEnviroment.enterNewScope();
 		// Possibly hashmap of values? Where a record index expression then does a look up on that hashmap
+		HashMap<String, Object> recordMap = new HashMap<>();
 		StatementEvaluator sEval = new StatementEvaluator(typeEnviroment);
-		sEval.eval(a.getArgs());
 
-		ret(null);
+		for(INStatement stmt : a.getArgs())
+		{
+			sEval.eval(stmt);
+			if (stmt instanceof NDeclaration)
+			{
+				String name = ((NDeclaration) stmt).getRhs().getName();
+				recordMap.put(name, typeEnviroment.lookup(name));
+			}
+			else if (stmt instanceof NDeclareAssign)
+			{
+				String name = ((NDeclareAssign) stmt).getIdentifier().getName();
+				recordMap.put(name, typeEnviroment.lookup(name));
+			}
+			else if(stmt instanceof NAssignment)
+			{
+				String name = ((NAssignment) stmt).getLhs().getName();
+				recordMap.put(name, typeEnviroment.lookup(name));
+			}
+		}
+
 		typeEnviroment.exitScope();
+
+		for(Map.Entry<String, Object> entry : recordMap.entrySet())
+		{
+			System.out.println(entry.getKey() + " equals : " + entry.getValue());
+		}
+
+		ret(recordMap);
+
 	}
 
 	@Override public void visit(NFunction a)
