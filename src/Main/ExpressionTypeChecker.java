@@ -180,6 +180,25 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 	}
 
+	@Override public void visit(FunctionCall a)
+	{
+		INExpr func = typecheck(a.getFunction());
+
+		NTypeFunction funcType = (NTypeFunction) func.getType();
+
+		IType returnType = funcType.getResult();
+
+		List<INExpr> argValues = new LinkedList<>();
+		for(IASTExpr expr : a.getArgValues())
+		{
+			argValues.add(typecheck(expr));
+		}
+
+		// And it has the return type of the return statement, or rather the function return type!
+
+		ret(new NFunctionCall(returnType, func, argValues));
+	}
+
 	@Override public void visit(Record a)
 	{
 		// What to type check about a record?
@@ -247,11 +266,6 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		{
 			throw new TypeException("RECORD DOES NOT CONTAIN : " + index);
 		}
-
-	}
-
-	@Override public void visit(FunctionCall a)
-	{
 
 	}
 

@@ -139,6 +139,8 @@ public class StatementEvaluator implements INStatementVisitor
 		// Return this from a function
 		// int x := f(3), so there is a function tied to f, and whatever it does with 3 gets returned out
 		// so to me it makes sense if this was associated with f(3)
+		// if return, discontinue the statements
 		Object x = exprEval.eval(a.getExpr());
+		evalEnviroment.declare(a.getUniqueName(), x);
 	}
 }

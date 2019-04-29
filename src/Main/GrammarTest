@@ -36,8 +36,9 @@ print array;
 int recTest := a.a;
 print recTest;
 
-(int a, int b) -> bool p := func (int a, int b) -> bool
+(int a, int b) -> bool dumbFunc := func (int a, int b) -> bool
 {
-   a := 12;
-   return true;
+   return a + b < 10;
 };
+
+print dumbFunc(3, 5);

@@ -281,27 +281,73 @@ public class ExpressionEvaluator implements INExprVisitor
 		ret(recordMap);
 	}
 
-	@Override public void visit(NFunction a)
-	{
-		typeEnviroment.enterNewScope();
-
-		// what am I even returning here??? A function? but how?
-		// Possibly the return type?, and then a function has an inner type of return type?
-		// A closure would just be checking if its defined in scope, and if not then getting the
-		// value from outside the scope
-
-		// Oh wait, maybe just return the body of the function and tie that to whatever assigning to
-		// so that a function is called, just assign those values to the args and then eval the body
-
-		ret(a.getBody());
-
-		typeEnviroment.exitScope();
-	}
-
 	@Override public void visit(NRecordAccess a)
 	{
 		// Here I need eval the left to get the hashmap
 		HashMap<String, Object> map = (HashMap <String,Object>) eval(a.getRec());
 		ret(map.get(a.getIndex()));
 	}
+
+	@Override public void visit(NFunction a)
+	{
+		typeEnviroment.enterNewScope();
+
+		// what am I even returning here??? A function? but how?
+		// A closure would just be checking if its defined in scope, and if not then getting the
+		// value from outside the scope
+
+		// Oh wait, maybe just return the body of the function and tie that to whatever assigning to
+		// so that a function is called, just assign those values to the args and then eval the body
+
+		// So on a function call, I get the function, and then create NAssignment nodes based on the functions args
+		// but that needs to come after they have been declared? Or hmm
+
+		// For function
+		// if return statement, discontinue the rest of the statements
+
+		// Oh jesus, I could get how many args there are, and then add Assignment nodes after those
+
+
+		ret(a);
+
+		typeEnviroment.exitScope();
+	}
+
+	@Override public void visit(NFunctionCall a)
+	{
+		NFunction func = (NFunction) eval(a.getFunction());
+
+		// At this point I've already type checked to make sure that the amount of args passed
+		// into the function call, match the function itself, as well as their types. so this
+		// should be safe
+		int numArgs = a.getArgValues().size();
+
+		NTypeFunction funcType = (NTypeFunction) func.getType();
+		NTypeRecord recType = (NTypeRecord) funcType.getArgs();
+
+		Iterator<NIdentifier> it1 = recType.getArgs().iterator();
+		Iterator<INExpr> it2 = a.getArgValues().iterator();
+
+		// EX numArgs = 2, I know that I need to begin inserting at 2nd pos in the body
+		// and stop after inserting at pos 3
+		for(int i = numArgs; i < numArgs * 2; i++)
+		{
+			// Need the args from the func, but I have the list of exprs already
+			func.getBody().add(i, new NAssignment(it1.next(), it2.next()));
+		}
+
+		StatementEvaluator sEval = new StatementEvaluator(typeEnviroment);
+
+		for(INStatement stmt : func.getBody())
+		{
+			sEval.eval(stmt);
+			if(stmt instanceof NReturn)
+			{
+				// Return possibly needs a unique name?
+				// Return the value of the return statement
+				ret(typeEnviroment.lookup(((NReturn) stmt).getUniqueName()));
+			}
+		}
+	}
+
 }

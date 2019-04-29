@@ -270,7 +270,7 @@ IASTExpr ArrayIndexExpression() :
     List<IASTExpr> indices = new LinkedList<IASTExpr>();
 }
 {
-    result = AtomicExpression()
+    result = FunctionCallExpresion()
     (
         <LBRACK> index = Expression() {indices.add(index);} <RBRACK>
     )*
@@ -286,6 +286,22 @@ IASTExpr ArrayIndexExpression() :
         }
     }
 
+}
+
+IASTExpr FunctionCallExpresion() :
+{
+    IASTExpr result;
+    IASTExpr argVal;
+    List<IASTExpr> argValues = new LinkedList<IASTExpr>();
+}
+{
+    result = AtomicExpression()
+    (
+       <LPAREN> argVal = AtomicExpression() {argValues.add(argVal);} (<COMMA> argVal = AtomicExpression() {argValues.add(argVal);})* <RPAREN>
+       {return new FunctionCall(result, argValues);}
+    )?
+
+    {return result;}
 }
 
 IASTExpr AtomicExpression() :
