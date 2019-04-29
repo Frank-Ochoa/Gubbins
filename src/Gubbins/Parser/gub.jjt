@@ -79,7 +79,7 @@ TOKEN : /* OPERATORS*/
     |   <LPAREN : "(" >
     |   <RPAREN : ")" >
     |   <COMMA : "," >
-    |   <DOT : ".">
+    |   <DOT :  "." >
     |   <LBRACK: "[">
     |   <RBRACK: "]">
 }
@@ -241,17 +241,26 @@ IASTExpr MultiplicativeExpression() :
     IASTExpr result, b;
 }
 {
-    result = ArrayIndexExpression()
+    result = RecordAccessExprssion()
     (
-           <MULT> b = ArrayIndexExpression() {result = new Mult(result, b);}
-        |  <DIV>  b = ArrayIndexExpression() {result = new Div(result, b); }
+           <MULT> b = RecordAccessExprssion() {result = new Mult(result, b);}
+        |  <DIV>  b = RecordAccessExprssion() {result = new Div(result, b); }
 
     )*
     { return result; }
 }
 
-IASTExpr RecordAcessExprssion
+IASTExpr RecordAccessExprssion () :
 {
+    IASTExpr result;
+    Token index;
+}
+{
+    result = ArrayIndexExpression()
+     (
+        <DOT> index = <IDENTIFIER> {result = new RecordAccess(result, index.image);}
+     )?
+    { return result;}
 }
 
 IASTExpr ArrayIndexExpression() :

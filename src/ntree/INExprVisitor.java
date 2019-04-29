@@ -18,4 +18,5 @@ public interface INExprVisitor
 	void visit(NOR a);
 	void visit(NRecord a);
 	void visit(NFunction a);
+	void visit(NRecordAccess a);
 }

@@ -93,14 +93,11 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		TypeTypeChecker t = new TypeTypeChecker();
 		IType arrayType = t.typecheck(array.getType());
 
-		// Also need to make sure that the index does not exceed the size of the array
-		// No way to do that right now since EX: Have no way of evaluating a Plus node currently
-
 		List<INExpr> indices = new LinkedList<>();
-		for(IASTExpr index : a.getIndices())
+		for (IASTExpr index : a.getIndices())
 		{
 			INExpr nIndex = tcheck(index);
-			if(nIndex.getType() != NTypeInt.INT)
+			if (nIndex.getType() != NTypeInt.INT)
 			{
 				throw new TypeException("BAD INDEX TYPE GIVEN");
 
@@ -108,13 +105,6 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 			indices.add(nIndex);
 		}
-
-
-		/*INExpr index = tcheck(a.getIndex());
-		if (index.getType() != NTypeInt.INT)
-		{
-			throw new TypeException("BAD INDEX TYPE GIVEN");
-		}*/
 
 		ret(new NArrayIndex(arrayType, array, indices));
 	}
@@ -128,7 +118,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		TypeTypeChecker t = new TypeTypeChecker();
 		// Need to make sure this is a TypeFunction
 		IType functionType = t.typecheck(a.getTypeFunction());
-		if((!(functionType instanceof NTypeFunction)))
+		if ((!(functionType instanceof NTypeFunction)))
 		{
 			throw new TypeException("NOT A TYPE FUNCTION");
 		}
@@ -139,19 +129,19 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		StatementTypeChecker statementTypeChecker = new StatementTypeChecker(typeEnvironment);
 		List<INStatement> nStmts = new LinkedList<>();
 
-		for(IASTStatement stmt : a.getBody())
+		for (IASTStatement stmt : a.getBody())
 		{
 			// For making sure there is at least one return stmt, will still also need to make
 			// that each is of the return type found in the functionType
 
 			INStatement nStmt = statementTypeChecker.typecheck(stmt);
 
-			if(nStmt instanceof NReturn)
+			if (nStmt instanceof NReturn)
 			{
 				// This boolean might be redundant
 				returnThere = true;
 
-				if(!(((NReturn) nStmt).getExpr().getType().equals(((NTypeFunction) functionType).getResult())))
+				if (!(((NReturn) nStmt).getExpr().getType().equals(((NTypeFunction) functionType).getResult())))
 				{
 					returnTypeGood = false;
 				}
@@ -162,12 +152,12 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 		typeEnvironment.exitScope();
 
-		if(!returnThere)
+		if (!returnThere)
 		{
 			throw new TypeException("NO RETURN STATEMENT GIVEN");
 		}
 
-		if(!returnTypeGood)
+		if (!returnTypeGood)
 		{
 			throw new TypeException("AT LEAST ONE RETURN TYPE DOES NOT MATCH FUNCTION RETURN TYPE");
 		}
@@ -187,12 +177,12 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		StatementTypeChecker statementTypeChecker = new StatementTypeChecker(typeEnvironment);
 
 		// Each stmt is guaranteed to be an Assignment, a declare, or declare%assign by the grammar
-		for(IASTStatement stmt : a.getElements())
+		for (IASTStatement stmt : a.getElements())
 		{
 			INStatement nElement = statementTypeChecker.typecheck(stmt);
 
 			// Compute the type of the record
-			if(nElement instanceof NDeclaration)
+			if (nElement instanceof NDeclaration)
 			{
 				nIdentifiers.add(((NDeclaration) nElement).getRhs());
 			}
@@ -207,6 +197,42 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		typeEnvironment.exitScope();
 
 		ret(new NRecord(new NTypeRecord(nIdentifiers), nElements));
+	}
+
+	@Override public void visit(RecordAccess a)
+	{
+		INExpr record = tcheck(a.getRec());
+		String index = a.getIndex();
+
+		IType recType = record.getType();
+		IType recAT = null;
+
+		if (recType instanceof NTypeRecord)
+		{
+			// Need to check the args in the record if their name matches the index
+			for (NIdentifier ident : ((NTypeRecord) recType).getArgs())
+			{
+				if(ident.getName().equals(index))
+				{
+					recAT = ident.getType();
+				}
+			}
+		}
+		else
+		{
+			throw new TypeException("ATTEMPTING TO ACCESS NON RECORD");
+		}
+
+
+		if(recAT != null)
+		{
+			ret(new NRecordAccess(recAT, record, index));
+		}
+		else
+		{
+			throw new TypeException("RECORD DOES NOT CONTAIN : " + index);
+		}
+
 	}
 
 	@Override public void visit(Identifier a)

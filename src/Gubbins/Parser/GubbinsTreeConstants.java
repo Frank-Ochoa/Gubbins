@@ -15,18 +15,19 @@ public interface GubbinsTreeConstants
   public int JJTCONDITIONALEXPRESSION = 9;
   public int JJTADDITIVEEXPRESSION = 10;
   public int JJTMULTIPLICATIVEEXPRESSION = 11;
-  public int JJTARRAYINDEXEXPRESSION = 12;
-  public int JJTATOMICEXPRESSION = 13;
-  public int JJTASSIGNMENT = 14;
-  public int JJTFUNCTIONTYPE = 15;
-  public int JJTTYPE = 16;
-  public int JJTATOMICTYPE = 17;
-  public int JJTARRAY = 18;
-  public int JJTDOWHILELOOP = 19;
-  public int JJTIF = 20;
-  public int JJTRECORD = 21;
-  public int JJTFUNCTION = 22;
-  public int JJTRETURN = 23;
+  public int JJTRECORDACCESSEXPRSSION = 12;
+  public int JJTARRAYINDEXEXPRESSION = 13;
+  public int JJTATOMICEXPRESSION = 14;
+  public int JJTASSIGNMENT = 15;
+  public int JJTFUNCTIONTYPE = 16;
+  public int JJTTYPE = 17;
+  public int JJTATOMICTYPE = 18;
+  public int JJTARRAY = 19;
+  public int JJTDOWHILELOOP = 20;
+  public int JJTIF = 21;
+  public int JJTRECORD = 22;
+  public int JJTFUNCTION = 23;
+  public int JJTRETURN = 24;
 
 
   public String[] jjtNodeName = {
@@ -42,6 +43,7 @@ public interface GubbinsTreeConstants
     "ConditionalExpression",
     "AdditiveExpression",
     "MultiplicativeExpression",
+    "RecordAccessExprssion",
     "ArrayIndexExpression",
     "AtomicExpression",
     "Assignment",
@@ -56,4 +58,4 @@ public interface GubbinsTreeConstants
     "Return",
   };
 }
-/* JavaCC - OriginalChecksum=9be57fb8cb37e1f52a2ed61b1d28aa4b (do not edit this line) */
+/* JavaCC - OriginalChecksum=c41f058378e591192fc72ff68fe53e14 (do not edit this line) */

@@ -83,7 +83,7 @@ TOKEN : /* OPERATORS*/
     |   <LPAREN : "(" >
     |   <RPAREN : ")" >
     |   <COMMA : "," >
-    |   <DOT : ".">
+    |   <DOT :  "." >
     |   <LBRACK: "[">
     |   <RBRACK: "]">
 }
@@ -647,10 +647,10 @@ IASTExpr MultiplicativeExpression() :
 {/*@bgen(jjtree) MultiplicativeExpression */
     try {
 /*@egen*/
-    result = ArrayIndexExpression()
+    result = RecordAccessExprssion()
     (
-           <MULT> b = ArrayIndexExpression() {result = new Mult(result, b);}
-        |  <DIV>  b = ArrayIndexExpression() {result = new Div(result, b); }
+           <MULT> b = RecordAccessExprssion() {result = new Mult(result, b);}
+        |  <DIV>  b = RecordAccessExprssion() {result = new Div(result, b); }
 
     )*/*@bgen(jjtree)*/
     {
@@ -659,6 +659,50 @@ IASTExpr MultiplicativeExpression() :
     }
 /*@egen*/
     { return result; }/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
+/*@egen*/
+}
+
+IASTExpr RecordAccessExprssion () :
+{/*@bgen(jjtree) RecordAccessExprssion */
+    SimpleNode jjtn000 = new SimpleNode(JJTRECORDACCESSEXPRSSION);
+    boolean jjtc000 = true;
+    jjtree.openNodeScope(jjtn000);
+/*@egen*/
+    IASTExpr result;
+    Token index;
+}
+{/*@bgen(jjtree) RecordAccessExprssion */
+    try {
+/*@egen*/
+    result = ArrayIndexExpression()
+     (
+        <DOT> index = <IDENTIFIER> {result = new RecordAccess(result, index.image);}
+     )?/*@bgen(jjtree)*/
+    {
+      jjtree.closeNodeScope(jjtn000, true);
+      jjtc000 = false;
+    }
+/*@egen*/
+    { return result;}/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);

@@ -278,13 +278,7 @@ public class ExpressionEvaluator implements INExprVisitor
 
 		typeEnviroment.exitScope();
 
-		for(Map.Entry<String, Object> entry : recordMap.entrySet())
-		{
-			System.out.println(entry.getKey() + " equals : " + entry.getValue());
-		}
-
 		ret(recordMap);
-
 	}
 
 	@Override public void visit(NFunction a)
@@ -292,5 +286,12 @@ public class ExpressionEvaluator implements INExprVisitor
 		typeEnviroment.enterNewScope();
 		 ret(null);
 		 typeEnviroment.exitScope();
+	}
+
+	@Override public void visit(NRecordAccess a)
+	{
+		// Here I need eval the left to get the hashmap
+		HashMap<String, Object> map = (HashMap <String,Object>) eval(a.getRec());
+		ret(map.get(a.getIndex()));
 	}
 }
