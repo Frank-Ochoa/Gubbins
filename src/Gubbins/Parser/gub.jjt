@@ -162,6 +162,19 @@ List<IASTStatement> FunctionStatements() :
     { return result; }
 }
 
+Return Return() :
+{
+    // Every function needs to have a return statement, at least one, that matches the functions
+    // return type, so that's where I get the return type from
+   // What is this though? A return key word followed by an expression
+   IASTExpr expr;
+}
+{
+   <RETURN> expr = Expression()
+
+   {return new Return(expr);}
+}
+
 While WhileLoop() :
 {
     List<IASTStatement> stmts;
@@ -170,7 +183,7 @@ While WhileLoop() :
 {
     <WHILE> <LPAREN> expr = Expression() <RPAREN>
     <LCURLY>
-        stmts = Statements()
+        stmts = FunctionStatements()
     <RCURLY>
     { return new While(expr, stmts); }
 }
@@ -184,7 +197,7 @@ For ForLoop() :
 {
     <FOR> t = <IDENTIFIER> <IN> <RANGE> expr = Expression()
     <LCURLY>
-        stmts = Statements()
+        stmts = FunctionStatements()
     <RCURLY>
     { return new For(new Identifier(t.image), expr, stmts); }
 }
@@ -297,7 +310,7 @@ IASTExpr FunctionCallExpresion() :
 {
     result = AtomicExpression()
     (
-       <LPAREN> argVal = AtomicExpression() {argValues.add(argVal);} (<COMMA> argVal = AtomicExpression() {argValues.add(argVal);})* <RPAREN>
+       <LPAREN> argVal = Expression() {argValues.add(argVal);} (<COMMA> argVal = Expression() {argValues.add(argVal);})* <RPAREN>
        {return new FunctionCall(result, argValues);}
     )?
 
@@ -387,8 +400,8 @@ IASTType AtomicType() :
          <TYPE_INT>               {return TypeInt.INT;}
     |    <TYPE_DOUBLE>            {return TypeDouble.DOUBLE;}
     |    <TYPE_BOOLEAN>           {return TypeBoolean.BOOLEAN;}
-    | <LPAREN> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));}
-         (<COMMA> t = Type() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));})* <RPAREN>
+    | <LPAREN> t = FunctionType() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));}
+         (<COMMA> t = FunctionType() ident = <IDENTIFIER> {args.add(t); idents.add(new Identifier(ident.image));})* <RPAREN>
          {
 
          Iterator<Identifier> it1 = idents.iterator();
@@ -423,7 +436,7 @@ DoWhile DoWhileLoop() :
 {
     <DO>
     <LCURLY>
-        stmts = Statements()
+        stmts = FunctionStatements()
     <RCURLY>
     <WHILE> <LPAREN> expr = Expression() <RPAREN>
     {return new DoWhile(expr, stmts);}
@@ -437,7 +450,7 @@ If If() :
 {
     <IF> <LPAREN> condt = Expression() <RPAREN>
     <LCURLY>
-        stmts = Statements()
+        stmts = FunctionStatements()
     <RCURLY>
 
     {return new If(condt, stmts);}
@@ -468,20 +481,6 @@ Function Function() :
 
     {return new Function(def, stmts);}
 }
-
-Return Return() :
-{
-    // Every function needs to have a return statement, at least one, that matches the functions
-    // return type, so that's where I get the return type from
-   // What is this though? A return key word followed by an expression
-   IASTExpr expr;
-}
-{
-   <RETURN> expr = Expression()
-
-   {return new Return(expr);}
-}
-
 // Could do AtomicType() <IDENT>, then return a hashmap of them, so a record would be hashmap from ident -> type
 
 

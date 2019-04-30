@@ -126,13 +126,10 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 		if (functionType instanceof NTypeFunction)
 		{
-			TypeFunction astTF = (TypeFunction) a.getTypeFunction();
-			TypeRecord astTR = (TypeRecord) astTF.getArgs();
-
-			for(Map.Entry<Identifier, IASTType> entry : astTR.getArgs().entrySet())
+			NTypeRecord typeRec = (NTypeRecord) ((NTypeFunction) functionType).getArgs();
+			for(NIdentifier ident : typeRec.getArgs())
 			{
-				//System.out.println(entry.getKey().getName() + " : " + entry.getValue());
-				a.getBody().add(0, new Declaration(entry.getValue(), entry.getKey(), new LinkedList<>()));
+				typeEnvironment.declare(ident.getName(), ident.getType());
 			}
 		}
 		else
@@ -147,6 +144,8 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		{
 			// For making sure there is at least one return stmt, will still also need to make
 			// that each is of the return type found in the functionType
+
+			// Going to need that same kind of stack set up here probably as well
 
 			INStatement nStmt = statementTypeChecker.typecheck(stmt);
 

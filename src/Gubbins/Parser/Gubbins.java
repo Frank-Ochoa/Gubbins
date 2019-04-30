@@ -319,6 +319,41 @@ if (jjtc000) {
     throw new Error("Missing return statement in function");
   }
 
+  static final public Return Return() throws ParseException {/*@bgen(jjtree) Return */
+   SimpleNode jjtn000 = new SimpleNode(JJTRETURN);
+   boolean jjtc000 = true;
+   jjtree.openNodeScope(jjtn000);// Every function needs to have a return statement, at least one, that matches the functions
+    // return type, so that's where I get the return type from
+   // What is this though? A return key word followed by an expression
+   IASTExpr expr;
+    try {
+      jj_consume_token(RETURN);
+      expr = Expression();
+jjtree.closeNodeScope(jjtn000, true);
+     jjtc000 = false;
+{if ("" != null) return new Return(expr);}
+    } catch (Throwable jjte000) {
+if (jjtc000) {
+       jjtree.clearNodeScope(jjtn000);
+       jjtc000 = false;
+     } else {
+       jjtree.popNode();
+     }
+     if (jjte000 instanceof RuntimeException) {
+       {if (true) throw (RuntimeException)jjte000;}
+     }
+     if (jjte000 instanceof ParseException) {
+       {if (true) throw (ParseException)jjte000;}
+     }
+     {if (true) throw (Error)jjte000;}
+    } finally {
+if (jjtc000) {
+       jjtree.closeNodeScope(jjtn000, true);
+     }
+    }
+    throw new Error("Missing return statement in function");
+  }
+
   static final public While WhileLoop() throws ParseException {/*@bgen(jjtree) WhileLoop */
     SimpleNode jjtn000 = new SimpleNode(JJTWHILELOOP);
     boolean jjtc000 = true;
@@ -330,7 +365,7 @@ if (jjtc000) {
       expr = Expression();
       jj_consume_token(RPAREN);
       jj_consume_token(LCURLY);
-      stmts = Statements();
+      stmts = FunctionStatements();
       jj_consume_token(RCURLY);
 jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
@@ -370,7 +405,7 @@ if (jjtc000) {
       jj_consume_token(RANGE);
       expr = Expression();
       jj_consume_token(LCURLY);
-      stmts = Statements();
+      stmts = FunctionStatements();
       jj_consume_token(RCURLY);
 jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
@@ -755,7 +790,7 @@ if (jjtc000) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case LPAREN:{
         jj_consume_token(LPAREN);
-        argVal = AtomicExpression();
+        argVal = Expression();
 argValues.add(argVal);
         label_7:
         while (true) {
@@ -769,7 +804,7 @@ argValues.add(argVal);
             break label_7;
           }
           jj_consume_token(COMMA);
-          argVal = AtomicExpression();
+          argVal = Expression();
 argValues.add(argVal);
         }
         jj_consume_token(RPAREN);
@@ -1119,7 +1154,7 @@ jjtree.closeNodeScope(jjtn000, true);
         }
       case LPAREN:{
         jj_consume_token(LPAREN);
-        t = Type();
+        t = FunctionType();
         ident = jj_consume_token(IDENTIFIER);
 args.add(t); idents.add(new Identifier(ident.image));
         label_10:
@@ -1134,7 +1169,7 @@ args.add(t); idents.add(new Identifier(ident.image));
             break label_10;
           }
           jj_consume_token(COMMA);
-          t = Type();
+          t = FunctionType();
           ident = jj_consume_token(IDENTIFIER);
 args.add(t); idents.add(new Identifier(ident.image));
         }
@@ -1239,7 +1274,7 @@ if (jjtc000) {
     try {
       jj_consume_token(DO);
       jj_consume_token(LCURLY);
-      stmts = Statements();
+      stmts = FunctionStatements();
       jj_consume_token(RCURLY);
       jj_consume_token(WHILE);
       jj_consume_token(LPAREN);
@@ -1281,7 +1316,7 @@ if (jjtc000) {
       condt = Expression();
       jj_consume_token(RPAREN);
       jj_consume_token(LCURLY);
-      stmts = Statements();
+      stmts = FunctionStatements();
       jj_consume_token(RCURLY);
 jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
@@ -1397,41 +1432,6 @@ if (jjtc000) {
     throw new Error("Missing return statement in function");
   }
 
-  static final public Return Return() throws ParseException {/*@bgen(jjtree) Return */
-   SimpleNode jjtn000 = new SimpleNode(JJTRETURN);
-   boolean jjtc000 = true;
-   jjtree.openNodeScope(jjtn000);// Every function needs to have a return statement, at least one, that matches the functions
-    // return type, so that's where I get the return type from
-   // What is this though? A return key word followed by an expression
-   IASTExpr expr;
-    try {
-      jj_consume_token(RETURN);
-      expr = Expression();
-jjtree.closeNodeScope(jjtn000, true);
-     jjtc000 = false;
-{if ("" != null) return new Return(expr);}
-    } catch (Throwable jjte000) {
-if (jjtc000) {
-       jjtree.clearNodeScope(jjtn000);
-       jjtc000 = false;
-     } else {
-       jjtree.popNode();
-     }
-     if (jjte000 instanceof RuntimeException) {
-       {if (true) throw (RuntimeException)jjte000;}
-     }
-     if (jjte000 instanceof ParseException) {
-       {if (true) throw (ParseException)jjte000;}
-     }
-     {if (true) throw (Error)jjte000;}
-    } finally {
-if (jjtc000) {
-       jjtree.closeNodeScope(jjtn000, true);
-     }
-    }
-    throw new Error("Missing return statement in function");
-  }
-
   static private boolean jj_2_1(int xla)
  {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
@@ -1448,6 +1448,73 @@ if (jjtc000) {
     finally { jj_save(1, xla); }
   }
 
+  static private boolean jj_3R_15()
+ {
+    if (jj_scan_token(LBRACK)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_25()
+ {
+    if (jj_scan_token(TYPE_BOOLEAN)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_24()
+ {
+    if (jj_scan_token(TYPE_DOUBLE)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_16()
+ {
+    if (jj_scan_token(ASSIGN_EQUALS)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_26()
+ {
+    if (jj_scan_token(LPAREN)) return true;
+    if (jj_3R_17()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_23()
+ {
+    if (jj_scan_token(TYPE_INT)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_22()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_23()) {
+    jj_scanpos = xsp;
+    if (jj_3R_24()) {
+    jj_scanpos = xsp;
+    if (jj_3R_25()) {
+    jj_scanpos = xsp;
+    if (jj_3R_26()) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  static private boolean jj_3R_19()
+ {
+    if (jj_scan_token(ARROW)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_2()
+ {
+    if (jj_3R_13()) return true;
+    if (jj_scan_token(SEMI)) return true;
+    return false;
+  }
+
   static private boolean jj_3R_17()
  {
     if (jj_3R_18()) return true;
@@ -1456,6 +1523,13 @@ if (jjtc000) {
       xsp = jj_scanpos;
       if (jj_3R_19()) { jj_scanpos = xsp; break; }
     }
+    return false;
+  }
+
+  static private boolean jj_3_1()
+ {
+    if (jj_3R_13()) return true;
+    if (jj_scan_token(SEMI)) return true;
     return false;
   }
 
@@ -1501,80 +1575,6 @@ if (jjtc000) {
     jj_scanpos = xsp;
     if (jj_3R_21()) return true;
     }
-    return false;
-  }
-
-  static private boolean jj_3_2()
- {
-    if (jj_3R_13()) return true;
-    if (jj_scan_token(SEMI)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_1()
- {
-    if (jj_3R_13()) return true;
-    if (jj_scan_token(SEMI)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_15()
- {
-    if (jj_scan_token(LBRACK)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_25()
- {
-    if (jj_scan_token(TYPE_BOOLEAN)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_24()
- {
-    if (jj_scan_token(TYPE_DOUBLE)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_16()
- {
-    if (jj_scan_token(ASSIGN_EQUALS)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_26()
- {
-    if (jj_scan_token(LPAREN)) return true;
-    if (jj_3R_18()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_23()
- {
-    if (jj_scan_token(TYPE_INT)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_22()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_23()) {
-    jj_scanpos = xsp;
-    if (jj_3R_24()) {
-    jj_scanpos = xsp;
-    if (jj_3R_25()) {
-    jj_scanpos = xsp;
-    if (jj_3R_26()) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  static private boolean jj_3R_19()
- {
-    if (jj_scan_token(ARROW)) return true;
     return false;
   }
 

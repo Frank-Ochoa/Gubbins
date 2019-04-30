@@ -6,21 +6,21 @@ import symtab.ISymTab;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 public class StatementEvaluator implements INStatementVisitor
 {
 	private ISymTab<Object> evalEnviroment;
 	private ExpressionEvaluator exprEval;
+	private Stack<Boolean> markerS;
+	private Stack<Object> returnValS;
 
 	public StatementEvaluator(ISymTab<Object> evalEnviroment)
 	{
 		this.evalEnviroment = evalEnviroment;
 		this.exprEval = new ExpressionEvaluator(evalEnviroment);
-	}
-
-	public ISymTab<Object> getEvalEnviroment()
-	{
-		return evalEnviroment;
+		this.markerS = new Stack<>();
+		this.returnValS = new Stack<>();
 	}
 
 	public void eval(INStatement e)
@@ -33,11 +33,20 @@ public class StatementEvaluator implements INStatementVisitor
 		for (INStatement e : l)
 		{
 			eval(e);
+
+			// If a return was executed, stop evaling further statements
+			if (markerS.peek())
+			{
+				System.out.println("Found a return");
+				break;
+			}
 		}
 	}
 
 	@Override public void visit(NDeclaration a)
 	{
+		markerS.push(false);
+
 		String ident = a.getRhs().getName();
 
 		// Just call the array method
@@ -52,6 +61,8 @@ public class StatementEvaluator implements INStatementVisitor
 
 	@Override public void visit(NDeclareAssign a)
 	{
+		markerS.push(false);
+
 		String ident = a.getIdentifier().getName();
 		Object value = exprEval.eval(a.getExpr());
 
@@ -60,7 +71,7 @@ public class StatementEvaluator implements INStatementVisitor
 
 	@SuppressWarnings("Duplicates") @Override public void visit(NAssignment a)
 	{
-		// Consider arrays, indices not empty
+		markerS.push(false);
 
 		// If indices empty, it's a normal assignment
 		if (a.getIndices().isEmpty())
@@ -97,9 +108,12 @@ public class StatementEvaluator implements INStatementVisitor
 
 	@Override public void visit(NIf a)
 	{
+		markerS.push(false);
+
 		if ((Boolean) exprEval.eval(a.getCondition()))
 		{
 			evalEnviroment.enterNewScope();
+			// If return, stop evaling the rest
 			eval(a.getStatements());
 			evalEnviroment.exitScope();
 		}
@@ -107,6 +121,8 @@ public class StatementEvaluator implements INStatementVisitor
 
 	@Override public void visit(NPrint a)
 	{
+		markerS.push(false);
+
 		Object x = exprEval.eval(a.getExpr());
 		if (x instanceof Object[])
 		{
@@ -120,6 +136,8 @@ public class StatementEvaluator implements INStatementVisitor
 
 	@Override public void visit(NWhile a)
 	{
+		markerS.push(false);
+
 		evalEnviroment.enterNewScope();
 
 		eval(a.getInitializers());
@@ -136,11 +154,19 @@ public class StatementEvaluator implements INStatementVisitor
 
 	@Override public void visit(NReturn a)
 	{
-		// Return this from a function
-		// int x := f(3), so there is a function tied to f, and whatever it does with 3 gets returned out
-		// so to me it makes sense if this was associated with f(3)
-		// if return, discontinue the statements
+		// Peek after evaling a statement, if true, stop evaling, and return back up
 		Object x = exprEval.eval(a.getExpr());
-		evalEnviroment.declare(a.getUniqueName(), x);
+		markerS.push(true);
+		returnValS.push(x);
+	}
+
+	public Stack<Boolean> getMarkerS()
+	{
+		return markerS;
+	}
+
+	public Stack<Object> getReturnValS()
+	{
+		return returnValS;
 	}
 }

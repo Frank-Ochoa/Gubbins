@@ -38,7 +38,38 @@ print recTest;
 
 (double a, int b) -> double dumbFunc := func (double a, int b) -> double
 {
+
+    if(a + b < 10)
+    {
+        if(a < 10)
+        {
+            return 1.0;
+        }
+    }
+
    return a + b;
 };
 
-print dumbFunc(3.0, 5);
+print dumbFunc(9.0, 3);
+
+(int a) -> int innerFunc := func (int a) -> int
+{
+    while(a < 20)
+    {
+        a := a + 1;
+    }
+
+    return a;
+};
+
+((int a) -> int function) -> int outerFunc := func ((int a) -> int function) -> int
+{
+    return function(0);
+};
+
+
+print outerFunc(innerFunc);
+
+
+
+

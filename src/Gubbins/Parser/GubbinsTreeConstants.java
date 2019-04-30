@@ -8,27 +8,27 @@ public interface GubbinsTreeConstants
   public int JJTSTATEMENTS = 2;
   public int JJTFUNCTIONSTATEMENT = 3;
   public int JJTFUNCTIONSTATEMENTS = 4;
-  public int JJTWHILELOOP = 5;
-  public int JJTFORLOOP = 6;
-  public int JJTPRINT = 7;
-  public int JJTEXPRESSION = 8;
-  public int JJTCONDITIONALEXPRESSION = 9;
-  public int JJTADDITIVEEXPRESSION = 10;
-  public int JJTMULTIPLICATIVEEXPRESSION = 11;
-  public int JJTRECORDACCESSEXPRSSION = 12;
-  public int JJTARRAYINDEXEXPRESSION = 13;
-  public int JJTFUNCTIONCALLEXPRESION = 14;
-  public int JJTATOMICEXPRESSION = 15;
-  public int JJTASSIGNMENT = 16;
-  public int JJTFUNCTIONTYPE = 17;
-  public int JJTTYPE = 18;
-  public int JJTATOMICTYPE = 19;
-  public int JJTARRAY = 20;
-  public int JJTDOWHILELOOP = 21;
-  public int JJTIF = 22;
-  public int JJTRECORD = 23;
-  public int JJTFUNCTION = 24;
-  public int JJTRETURN = 25;
+  public int JJTRETURN = 5;
+  public int JJTWHILELOOP = 6;
+  public int JJTFORLOOP = 7;
+  public int JJTPRINT = 8;
+  public int JJTEXPRESSION = 9;
+  public int JJTCONDITIONALEXPRESSION = 10;
+  public int JJTADDITIVEEXPRESSION = 11;
+  public int JJTMULTIPLICATIVEEXPRESSION = 12;
+  public int JJTRECORDACCESSEXPRSSION = 13;
+  public int JJTARRAYINDEXEXPRESSION = 14;
+  public int JJTFUNCTIONCALLEXPRESION = 15;
+  public int JJTATOMICEXPRESSION = 16;
+  public int JJTASSIGNMENT = 17;
+  public int JJTFUNCTIONTYPE = 18;
+  public int JJTTYPE = 19;
+  public int JJTATOMICTYPE = 20;
+  public int JJTARRAY = 21;
+  public int JJTDOWHILELOOP = 22;
+  public int JJTIF = 23;
+  public int JJTRECORD = 24;
+  public int JJTFUNCTION = 25;
 
 
   public String[] jjtNodeName = {
@@ -37,6 +37,7 @@ public interface GubbinsTreeConstants
     "Statements",
     "FunctionStatement",
     "FunctionStatements",
+    "Return",
     "WhileLoop",
     "ForLoop",
     "Print",
@@ -57,7 +58,6 @@ public interface GubbinsTreeConstants
     "If",
     "Record",
     "Function",
-    "Return",
   };
 }
-/* JavaCC - OriginalChecksum=f8cf4f6786ad67b170f6541098937cc5 (do not edit this line) */
+/* JavaCC - OriginalChecksum=815d5e37a7d6700a7395e18143c721ac (do not edit this line) */

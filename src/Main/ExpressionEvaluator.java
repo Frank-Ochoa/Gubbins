@@ -8,12 +8,12 @@ import java.util.*;
 public class ExpressionEvaluator implements INExprVisitor
 {
 	private Stack<Object> operand;
-	private ISymTab<Object> typeEnviroment;
+	private ISymTab<Object> valueEnviro;
 
-	public ExpressionEvaluator(ISymTab<Object> typeEnviroment)
+	public ExpressionEvaluator(ISymTab<Object> valueEnviro)
 	{
 		this.operand = new Stack<>();
-		this.typeEnviroment = typeEnviroment;
+		this.valueEnviro = valueEnviro;
 	}
 
 	public Object eval(INExpr e)
@@ -62,7 +62,7 @@ public class ExpressionEvaluator implements INExprVisitor
 
 	@Override public void visit(NIdentifier a)
 	{
-		Object identValue = typeEnviroment.lookup(a.getName());
+		Object identValue = valueEnviro.lookup(a.getName());
 		ret(identValue);
 	}
 
@@ -251,10 +251,10 @@ public class ExpressionEvaluator implements INExprVisitor
 
 	@Override public void visit(NRecord a)
 	{
-		typeEnviroment.enterNewScope();
+		valueEnviro.enterNewScope();
 		// Possibly hashmap of values? Where a record index expression then does a look up on that hashmap
 		HashMap<String, Object> recordMap = new HashMap<>();
-		StatementEvaluator sEval = new StatementEvaluator(typeEnviroment);
+		StatementEvaluator sEval = new StatementEvaluator(valueEnviro);
 
 		for(INStatement stmt : a.getArgs())
 		{
@@ -262,21 +262,21 @@ public class ExpressionEvaluator implements INExprVisitor
 			if (stmt instanceof NDeclaration)
 			{
 				String name = ((NDeclaration) stmt).getRhs().getName();
-				recordMap.put(name, typeEnviroment.lookup(name));
+				recordMap.put(name, valueEnviro.lookup(name));
 			}
 			else if (stmt instanceof NDeclareAssign)
 			{
 				String name = ((NDeclareAssign) stmt).getIdentifier().getName();
-				recordMap.put(name, typeEnviroment.lookup(name));
+				recordMap.put(name, valueEnviro.lookup(name));
 			}
 			else if(stmt instanceof NAssignment)
 			{
 				String name = ((NAssignment) stmt).getLhs().getName();
-				recordMap.put(name, typeEnviroment.lookup(name));
+				recordMap.put(name, valueEnviro.lookup(name));
 			}
 		}
 
-		typeEnviroment.exitScope();
+		valueEnviro.exitScope();
 
 		ret(recordMap);
 	}
@@ -290,7 +290,7 @@ public class ExpressionEvaluator implements INExprVisitor
 
 	@Override public void visit(NFunction a)
 	{
-		typeEnviroment.enterNewScope();
+		valueEnviro.enterNewScope();
 
 		// what am I even returning here??? A function? but how?
 		// A closure would just be checking if its defined in scope, and if not then getting the
@@ -310,17 +310,12 @@ public class ExpressionEvaluator implements INExprVisitor
 
 		ret(a);
 
-		typeEnviroment.exitScope();
+		valueEnviro.exitScope();
 	}
 
 	@Override public void visit(NFunctionCall a)
 	{
 		NFunction func = (NFunction) eval(a.getFunction());
-
-		// At this point I've already type checked to make sure that the amount of args passed
-		// into the function call, match the function itself, as well as their types. so this
-		// should be safe
-		int numArgs = a.getArgValues().size();
 
 		NTypeFunction funcType = (NTypeFunction) func.getType();
 		NTypeRecord recType = (NTypeRecord) funcType.getArgs();
@@ -328,26 +323,34 @@ public class ExpressionEvaluator implements INExprVisitor
 		Iterator<NIdentifier> it1 = recType.getArgs().iterator();
 		Iterator<INExpr> it2 = a.getArgValues().iterator();
 
-		// EX numArgs = 2, I know that I need to begin inserting at 2nd pos in the body
-		// and stop after inserting at pos 3
-		for(int i = numArgs; i < numArgs * 2; i++)
+
+		while(it1.hasNext() && it2.hasNext())
 		{
-			// Need the args from the func, but I have the list of exprs already
-			func.getBody().add(i, new NAssignment(it1.next(), it2.next()));
+			String name = it1.next().getName();
+			Object value = eval(it2.next());
+			valueEnviro.declare(name, value);
 		}
 
-		StatementEvaluator sEval = new StatementEvaluator(typeEnviroment);
+		StatementEvaluator sEval = new StatementEvaluator(valueEnviro);
+		Stack<Boolean> marker = sEval.getMarkerS();
+		Stack<Object> returnVals = sEval.getReturnValS();
 
 		for(INStatement stmt : func.getBody())
 		{
 			sEval.eval(stmt);
-			if(stmt instanceof NReturn)
+
+			// So will eval an if, and then a return, and then stop that evaling that if, and
+			// come back out to this loop, where then I need to ret whats on the eval stack
+			// but how ensure
+			if(marker.peek())
 			{
-				// Return possibly needs a unique name?
-				// Return the value of the return statement
-				ret(typeEnviroment.lookup(((NReturn) stmt).getUniqueName()));
+				marker.pop();
+				ret(returnVals.pop());
+				break;
 			}
+
 		}
+
 	}
 
 }
