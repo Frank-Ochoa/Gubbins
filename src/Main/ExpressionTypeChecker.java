@@ -7,10 +7,7 @@ import types.TypeException;
 import types.UndeclaredIdentifer;
 
 import java.lang.reflect.Type;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 public class ExpressionTypeChecker implements IASTExpressionVisitor
 {
@@ -115,7 +112,6 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 	{
 
 		boolean returnThere = false;
-		boolean returnTypeGood = true;
 		// Possibly needs a new scope
 		TypeTypeChecker t = new TypeTypeChecker();
 		// Need to make sure this is a TypeFunction
@@ -127,7 +123,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		if (functionType instanceof NTypeFunction)
 		{
 			NTypeRecord typeRec = (NTypeRecord) ((NTypeFunction) functionType).getArgs();
-			for(NIdentifier ident : typeRec.getArgs())
+			for (NIdentifier ident : typeRec.getArgs())
 			{
 				typeEnvironment.declare(ident.getName(), ident.getType());
 			}
@@ -139,17 +135,27 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 		StatementTypeChecker statementTypeChecker = new StatementTypeChecker(typeEnvironment);
 		List<INStatement> nStmts = new LinkedList<>();
+		Stack<Boolean> markers = statementTypeChecker.getMarkers();
+		Stack<IType> retType = statementTypeChecker.getRetType();
 
 		for (IASTStatement stmt : a.getBody())
 		{
 			// For making sure there is at least one return stmt, will still also need to make
 			// that each is of the return type found in the functionType
 
-			// Going to need that same kind of stack set up here probably as well
-
 			INStatement nStmt = statementTypeChecker.typecheck(stmt);
+			if (markers.peek())
+			{
+				markers.pop();
+				returnThere = true;
 
-			if (nStmt instanceof NReturn)
+				if (!(retType.pop().equals(((NTypeFunction) functionType).getResult())))
+				{
+					throw new TypeException("AT LEAST ONE RETURN TYPE DOES NOT MATCH FUNCTION RETURN TYPE");
+				}
+			}
+
+			/*if (nStmt instanceof NReturn)
 			{
 				// This boolean might be redundant
 				returnThere = true;
@@ -158,7 +164,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 				{
 					returnTypeGood = false;
 				}
-			}
+			}*/
 
 			nStmts.add(nStmt);
 		}
@@ -170,30 +176,46 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 			throw new TypeException("NO RETURN STATEMENT GIVEN");
 		}
 
-		if (!returnTypeGood)
-		{
-			throw new TypeException("AT LEAST ONE RETURN TYPE DOES NOT MATCH FUNCTION RETURN TYPE");
-		}
-
 		ret(new NFunction(functionType, nStmts));
-
 	}
 
 	@Override public void visit(FunctionCall a)
 	{
+
+		// Want to make sure that the size of the args as well as their types match
 		INExpr func = typecheck(a.getFunction());
+
+		if (!(func.getType() instanceof NTypeFunction))
+		{
+			throw new TypeException("CALL ON NON FUNCTION");
+		}
 
 		NTypeFunction funcType = (NTypeFunction) func.getType();
 
-		IType returnType = funcType.getResult();
-
-		List<INExpr> argValues = new LinkedList<>();
-		for(IASTExpr expr : a.getArgValues())
+		NTypeRecord recType = (NTypeRecord) funcType.getArgs();
+		if (recType.getArgs().size() != a.getArgValues().size())
 		{
-			argValues.add(typecheck(expr));
+			throw new TypeException("FUNCTION CALL ARGS SIZE DOES NOT MATCH");
 		}
 
-		// And it has the return type of the return statement, or rather the function return type!
+		List<INExpr> argValues = new LinkedList<>();
+		Iterator<NIdentifier> it = recType.getArgs().iterator();
+
+		for (IASTExpr expr : a.getArgValues())
+		{
+			INExpr argValue = typecheck(expr);
+			NIdentifier argParam = it.next();
+
+			// Pretty sure this check is redundant because assign will catch but this will catch sooner
+			if (!argValue.getType().equals(argParam.getType()))
+			{
+				throw new TypeException("FUNCTION CALL ARG TYPE INCORRECT");
+			}
+
+			argValues.add(argValue);
+		}
+
+		IType returnType = funcType.getResult();
 
 		ret(new NFunctionCall(returnType, func, argValues));
 	}
@@ -244,7 +266,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 			// Need to check the args in the record if their name matches the index
 			for (NIdentifier ident : ((NTypeRecord) recType).getArgs())
 			{
-				if(ident.getName().equals(index))
+				if (ident.getName().equals(index))
 				{
 					recAT = ident.getType();
 					break;
@@ -256,8 +278,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 			throw new TypeException("ATTEMPTING TO ACCESS NON RECORD");
 		}
 
-
-		if(recAT != null)
+		if (recAT != null)
 		{
 			ret(new NRecordAccess(recAT, record, index));
 		}

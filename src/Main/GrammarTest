@@ -50,7 +50,7 @@ print recTest;
    return a + b;
 };
 
-print dumbFunc(9.0, 3);
+print dumbFunc(9.0, 8);
 
 (int a) -> int innerFunc := func (int a) -> int
 {

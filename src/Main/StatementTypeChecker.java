@@ -16,6 +16,8 @@ public class StatementTypeChecker implements IASTStatementVisitor
 	// Could just make new ones each time used
 	private TypeTypeChecker typeTypeCheck;
 	private ExpressionTypeChecker exprTypeCheck;
+	private Stack<Boolean> markers;
+	private Stack<IType> retType;
 
 	public StatementTypeChecker(ISymTab<IType> typeEnvironment)
 	{
@@ -23,6 +25,8 @@ public class StatementTypeChecker implements IASTStatementVisitor
 		this.typeEnvironment = typeEnvironment;
 		this.typeTypeCheck = new TypeTypeChecker();
 		this.exprTypeCheck = new ExpressionTypeChecker(typeEnvironment);
+		this.markers = new Stack<>();
+		this.retType = new Stack<>();
 	}
 
 	private void ret(INStatement e)
@@ -42,8 +46,21 @@ public class StatementTypeChecker implements IASTStatementVisitor
 		return sstack.pop();
 	}
 
+	private List<INStatement> tcheck(List<IASTStatement> stmts)
+	{
+		LinkedList<INStatement> body = new LinkedList<>();
+
+		for(IASTStatement stmt : stmts)
+		{
+			body.add(tcheck(stmt));
+		}
+
+		return body;
+	}
+
 	@Override public void visit(Declaration a)
 	{
+		markers.push(false);
 		// Make sure grammar does that
 		IType type = typeTypeCheck.typecheck(a.getLhs());
 
@@ -70,6 +87,7 @@ public class StatementTypeChecker implements IASTStatementVisitor
 
 	@SuppressWarnings("Duplicates") @Override public void visit(DeclareAssign a)
 	{
+		markers.push(false);
 		// Get declared type od Iden
 		IType declareType = typeTypeCheck.typecheck(a.getType());
 
@@ -155,6 +173,7 @@ public class StatementTypeChecker implements IASTStatementVisitor
 
 	@SuppressWarnings("Duplicates") @Override public void visit(Assignment a)
 	{
+		markers.push(false);
 		// Change the LHS to be just an expression
 		NIdentifier lhs = (NIdentifier) exprTypeCheck.typecheck(a.getLhs());
 		INExpr rhs = exprTypeCheck.typecheck(a.getRhs());
@@ -212,7 +231,6 @@ public class StatementTypeChecker implements IASTStatementVisitor
 			}
 		}
 
-		//  not going to use the result
 		if (indices.isEmpty())
 		{
 			ret(new NAssignment(lhs, rhs));
@@ -225,6 +243,7 @@ public class StatementTypeChecker implements IASTStatementVisitor
 
 	@SuppressWarnings("Duplicates") @Override public void visit(For a)
 	{
+		markers.push(false);
 		// Question about this and if you want to loop range amount of times
 		INExpr range = exprTypeCheck.typecheck(a.getRange());
 		if (range.getType() != NTypeInt.INT)
@@ -233,11 +252,8 @@ public class StatementTypeChecker implements IASTStatementVisitor
 		}
 		typeEnvironment.enterNewScope();
 		typeEnvironment.declare(a.getIdentifier().getName(), NTypeInt.INT);
-		List<INStatement> body = new LinkedList<>();
-		for (IASTStatement node : a.getBody())
-		{
-			body.add(tcheck(node));
-		}
+		List<INStatement> body = tcheck(a.getBody());
+
 		typeEnvironment.exitScope();
 		NIdentifier var = new NIdentifier(a.getIdentifier().getName(), NTypeInt.INT);
 		body.add(new NAssignment(var, new NPlus(var, new NInt(1))));
@@ -257,6 +273,7 @@ public class StatementTypeChecker implements IASTStatementVisitor
 
 	public void visit(DoWhile a)
 	{
+		markers.push(false);
 		// Enter new scope
 		typeEnvironment.enterNewScope();
 		// Declare the $var initializer within the scope
@@ -264,11 +281,8 @@ public class StatementTypeChecker implements IASTStatementVisitor
 		//System.out.println(a.getInitialTrue().getName());
 
 		// Normalize the body of the doWhile
-		List<INStatement> body = new LinkedList<>();
-		for (IASTStatement node : a.getBody())
-		{
-			body.add(tcheck(node));
-		}
+		List<INStatement> body = tcheck(a.getBody());
+
 		// Normalize the initializer
 		NIdentifier initialTrue = (NIdentifier) exprTypeCheck.typecheck(a.getInitialTrue());
 		// Add to the scope that var now = false since the loop has ran once
@@ -294,45 +308,42 @@ public class StatementTypeChecker implements IASTStatementVisitor
 
 	@Override public void visit(While a)
 	{
+		markers.push(false);
 		INExpr e = exprTypeCheck.typecheck(a.getCondt());
 		if (e.getType() != NTypeBoolean.BOOLEAN)
 		{
 			throw new TypeException("Non boolean arguments");
 		}
-		List<INStatement> body = new LinkedList<>();
-		for (IASTStatement node : a.getBody())
-		{
-			body.add(tcheck(node));
-		}
+		List<INStatement> body = tcheck(a.getBody());
 
 		ret(new NWhile(e, body));
 	}
 
 	public void visit(If a)
 	{
+		markers.push(false);
 		INExpr e = exprTypeCheck.typecheck(a.getCondition());
 		if (e.getType() != NTypeBoolean.BOOLEAN)
 		{
 			throw new TypeException("Non boolean arguments");
 		}
-		List<INStatement> body = new LinkedList<>();
-		for (IASTStatement node : a.getStatements())
-		{
-			body.add(tcheck(node));
-		}
+		List<INStatement> body = tcheck(a.getStatements());
 
 		ret(new NIf(e, body));
 	}
 
 	public void visit(Print a)
 	{
+		markers.push(false);
 		INExpr expr = exprTypeCheck.typecheck(a.getExpr());
 		ret(new NPrint(expr));
 	}
 
 	@Override public void visit(Return a)
 	{
+		markers.push(true);
 		INExpr expr = exprTypeCheck.typecheck(a.getExpr());
+		retType.push(expr.getType());
 		ret(new NReturn(expr));
 	}
 
@@ -346,5 +357,15 @@ public class StatementTypeChecker implements IASTStatementVisitor
 		{
 			return node;
 		}
+	}
+
+	public Stack<Boolean> getMarkers()
+	{
+		return markers;
+	}
+
+	public Stack<IType> getRetType()
+	{
+		return retType;
 	}
 }
