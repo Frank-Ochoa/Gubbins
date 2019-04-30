@@ -308,7 +308,6 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		{
 			System.out.println(e.getType());
 			throw new TypeException("Non numeric arguments");
-			//  type checking error
 		}
 	}
 
@@ -334,6 +333,11 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		normalizeExprOperator(a);
 	}
 
+	@Override public void visit(Mod a)
+	{
+		normalizeExprOperator(a);
+	}
+
 	public void visit(Plus a)
 	{
 		normalizeExprOperator(a);
@@ -354,12 +358,46 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		normalizeExprOperator(a);
 	}
 
+	@Override public void visit(LessThanEQ a)
+	{
+		normalizeExprOperator(a);
+	}
+
+	@Override public void visit(GreaterThanEQ a)
+	{
+		normalizeExprOperator(a);
+	}
+
+	@Override public void visit(EQ a)
+	{
+		normalizeExprOperator(a);
+	}
+
+	@Override public void visit(NotEQ a)
+	{
+		normalizeExprOperator(a);
+	}
+
+	@Override public void visit(And a)
+	{
+		normalizeExprOperator(a);
+	}
+
+	@Override public void visit(Or a)
+	{
+		normalizeExprOperator(a);
+	}
+
 	private void normalizeExprOperator(IASTExprOperator operator)
 	{
 		INExpr l = tcheck(operator.getLeft());
-		checkIsNumeric(l);
 		INExpr r = tcheck(operator.getRight());
-		checkIsNumeric(r);
+
+		if(!(operator instanceof Or) && !(operator instanceof And))
+		{
+			checkIsNumeric(l);
+			checkIsNumeric(r);
+		}
 
 		OperatorNormalizer operatorNormalizer = new OperatorNormalizer();
 

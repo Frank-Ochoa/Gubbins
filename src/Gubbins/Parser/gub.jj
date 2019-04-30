@@ -75,6 +75,7 @@ TOKEN : /* OPERATORS*/
         <PLUS : "+">
     |   <MULT : "*">
     |   <DIV : "/">
+    |   <MOD: "%">
     |   <SUB : "-">
     |   <ASSIGN_EQUALS : ":=">
     |   <SEMI : ";">
@@ -102,6 +103,10 @@ TOKEN : /* BOOLEAN CONDITIONALS */
 	<EQ_TO : "=" >
 	|
 	<NOT_EQ_TO : "!=" >
+	|
+	<AND : "&" >
+	|
+	<OR : "|" >
 }
 
 /** Top level production. */
@@ -556,16 +561,24 @@ IASTExpr Expression() :
     jjtree.openNodeScope(jjtn000);
 /*@egen*/
     IASTExpr e;
+    IASTExpr b;
 }
 {/*@bgen(jjtree) Expression */
     try {
 /*@egen*/
-    e = ConditionalExpression()/*@bgen(jjtree)*/
-                                {
-                                  jjtree.closeNodeScope(jjtn000, true);
-                                  jjtc000 = false;
-                                }
-/*@egen*/ { return e; }/*@bgen(jjtree)*/
+    e = ConditionalExpression()
+    (
+       <AND> b = ConditionalExpression() {e = new And(e, b);}
+      | <OR> b = ConditionalExpression() {e = new Or(e, b);}
+
+    )*/*@bgen(jjtree)*/
+     {
+       jjtree.closeNodeScope(jjtn000, true);
+       jjtc000 = false;
+     }
+/*@egen*/
+
+     { return e; }/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
@@ -603,6 +616,11 @@ IASTExpr ConditionalExpression() :
     (
         <LESS_THAN> b = AdditiveExpression() {result = new LessThan(result, b);}
         | <GREATER_THAN> b = AdditiveExpression() {result = new GreaterThan(result, b);}
+        | <LESS_THAN_EQTO> b = AdditiveExpression() {result = new LessThanEQ(result, b);}
+        | <GREATER_THAN_EQTO> b = AdditiveExpression() {result = new GreaterThanEQ(result, b);}
+        | <EQ_TO> b = AdditiveExpression() {result = new EQ(result, b);}
+        | <NOT_EQ_TO> b = AdditiveExpression() {result = new NotEQ(result, b);}
+
         // And can do other conditionals under this if need be
     )*/*@bgen(jjtree)*/
     {
@@ -691,10 +709,11 @@ IASTExpr MultiplicativeExpression() :
 {/*@bgen(jjtree) MultiplicativeExpression */
     try {
 /*@egen*/
-    result = RecordAccessExprssion()
+    result = RecordAccessExpression()
     (
-           <MULT> b = RecordAccessExprssion() {result = new Mult(result, b);}
-        |  <DIV>  b = RecordAccessExprssion() {result = new Div(result, b); }
+           <MULT> b = RecordAccessExpression() {result = new Mult(result, b);}
+        |  <DIV>  b = RecordAccessExpression() {result = new Div(result, b); }
+        |  <MOD> b = RecordAccessExpression() {result = new Mod(result, b);}
 
     )*/*@bgen(jjtree)*/
     {
@@ -725,16 +744,16 @@ IASTExpr MultiplicativeExpression() :
 /*@egen*/
 }
 
-IASTExpr RecordAccessExprssion () :
-{/*@bgen(jjtree) RecordAccessExprssion */
-    SimpleNode jjtn000 = new SimpleNode(JJTRECORDACCESSEXPRSSION);
+IASTExpr RecordAccessExpression () :
+{/*@bgen(jjtree) RecordAccessExpression */
+    SimpleNode jjtn000 = new SimpleNode(JJTRECORDACCESSEXPRESSION);
     boolean jjtc000 = true;
     jjtree.openNodeScope(jjtn000);
 /*@egen*/
     IASTExpr result;
     Token index;
 }
-{/*@bgen(jjtree) RecordAccessExprssion */
+{/*@bgen(jjtree) RecordAccessExpression */
     try {
 /*@egen*/
     result = ArrayIndexExpression()

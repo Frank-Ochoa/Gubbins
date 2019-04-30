@@ -48,6 +48,36 @@ public class OperatorNormalizer implements IASTExprOperatorVisitor
 		ret(new NGreaterThan(left(), right()));
 	}
 
+	@Override public void visit(LessThanEQ a)
+	{
+		ret(new NLessThanEQ(left(), right()));
+	}
+
+	@Override public void visit(GreaterThanEQ a)
+	{
+		ret(new NGreaterThanEQ(left(), right()));
+	}
+
+	@Override public void visit(EQ a)
+	{
+		ret(new NEQ(left(), right()));
+	}
+
+	@Override public void visit(NotEQ a)
+	{
+		ret(new NNotEQ(left(), right()));
+	}
+
+	@Override public void visit(And a)
+	{
+		ret(new NAnd(left(), right()));
+	}
+
+	@Override public void visit(Or a)
+	{
+		ret(new NOR(left(), right()));
+	}
+
 	@Override public void visit(Mult a)
 	{
 		ret(new NMult(left(), right()));
@@ -56,6 +86,11 @@ public class OperatorNormalizer implements IASTExprOperatorVisitor
 	@Override public void visit(Div a)
 	{
 		ret(new NDiv(left(), right()));
+	}
+
+	@Override public void visit(Mod a)
+	{
+		ret(new NMod(left(), right()));
 	}
 
 	@Override public void visit(Plus a)

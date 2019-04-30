@@ -70,6 +70,9 @@ print dumbFunc(9.0, 8);
 
 print outerFunc(innerFunc);
 
+int boolTest := 5;
+
+print boolTest != 10 | boolTest > 10;
 
 
 

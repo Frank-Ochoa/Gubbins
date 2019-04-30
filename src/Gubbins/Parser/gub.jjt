@@ -71,6 +71,7 @@ TOKEN : /* OPERATORS*/
         <PLUS : "+">
     |   <MULT : "*">
     |   <DIV : "/">
+    |   <MOD: "%">
     |   <SUB : "-">
     |   <ASSIGN_EQUALS : ":=">
     |   <SEMI : ";">
@@ -98,6 +99,10 @@ TOKEN : /* BOOLEAN CONDITIONALS */
 	<EQ_TO : "=" >
 	|
 	<NOT_EQ_TO : "!=" >
+	|
+	<AND : "&" >
+	|
+	<OR : "|" >
 }
 
 /** Top level production. */
@@ -214,9 +219,17 @@ IASTStatement Print() :
 IASTExpr Expression() :
 {
     IASTExpr e;
+    IASTExpr b;
 }
 {
-    e = ConditionalExpression() { return e; }
+    e = ConditionalExpression()
+    (
+       <AND> b = ConditionalExpression() {e = new And(e, b);}
+      | <OR> b = ConditionalExpression() {e = new Or(e, b);}
+
+    )*
+
+     { return e; }
 }
 
 IASTExpr ConditionalExpression() :
@@ -228,6 +241,11 @@ IASTExpr ConditionalExpression() :
     (
         <LESS_THAN> b = AdditiveExpression() {result = new LessThan(result, b);}
         | <GREATER_THAN> b = AdditiveExpression() {result = new GreaterThan(result, b);}
+        | <LESS_THAN_EQTO> b = AdditiveExpression() {result = new LessThanEQ(result, b);}
+        | <GREATER_THAN_EQTO> b = AdditiveExpression() {result = new GreaterThanEQ(result, b);}
+        | <EQ_TO> b = AdditiveExpression() {result = new EQ(result, b);}
+        | <NOT_EQ_TO> b = AdditiveExpression() {result = new NotEQ(result, b);}
+
         // And can do other conditionals under this if need be
     )*
 
@@ -254,16 +272,17 @@ IASTExpr MultiplicativeExpression() :
     IASTExpr result, b;
 }
 {
-    result = RecordAccessExprssion()
+    result = RecordAccessExpression()
     (
-           <MULT> b = RecordAccessExprssion() {result = new Mult(result, b);}
-        |  <DIV>  b = RecordAccessExprssion() {result = new Div(result, b); }
+           <MULT> b = RecordAccessExpression() {result = new Mult(result, b);}
+        |  <DIV>  b = RecordAccessExpression() {result = new Div(result, b); }
+        |  <MOD> b = RecordAccessExpression() {result = new Mod(result, b);}
 
     )*
     { return result; }
 }
 
-IASTExpr RecordAccessExprssion () :
+IASTExpr RecordAccessExpression () :
 {
     IASTExpr result;
     Token index;

@@ -179,6 +179,22 @@ public class ExpressionEvaluator implements INExprVisitor
 		}
 	}
 
+	@Override public void visit(NMod a)
+	{
+		Object left = eval(a.getLeft());
+
+		Object right = eval(a.getRight());
+
+		if (a.getType() == NTypeInt.INT)
+		{
+			ret(((Integer) left % ((Integer) right)));
+		}
+		else
+		{
+			ret(((Double) left % ((Double) right)));
+		}
+	}
+
 	@Override public void visit(NSub a)
 	{
 		Object left = eval(a.getLeft());
@@ -224,6 +240,83 @@ public class ExpressionEvaluator implements INExprVisitor
 		else
 		{
 			operand.push(((Double) left > ((Double) right)));
+		}
+	}
+
+	@Override public void visit(NLessThanEQ a)
+	{
+		Object left = eval(a.getLeft());
+
+		Object right = eval(a.getRight());
+
+		if (a.getLeft().getType() == NTypeInt.INT)
+		{
+			operand.push(((Integer) left <= ((Integer) right)));
+		}
+		else
+		{
+			operand.push(((Double) left <= ((Double) right)));
+		}
+	}
+
+	@Override public void visit(NGreaterThanEQ a)
+	{
+		Object left = eval(a.getLeft());
+
+		Object right = eval(a.getRight());
+
+		if (a.getLeft().getType() == NTypeInt.INT)
+		{
+			operand.push(((Integer) left >= ((Integer) right)));
+		}
+		else
+		{
+			operand.push(((Double) left >= ((Double) right)));
+		}
+	}
+
+	@Override public void visit(NEQ a)
+	{
+		Object left = eval(a.getLeft());
+
+		Object right = eval(a.getRight());
+
+		if (a.getLeft().getType() == NTypeInt.INT)
+		{
+			operand.push((((Integer) left).equals((Integer) right)));
+		}
+		else
+		{
+			operand.push((((Double) left).equals((Double) right)));
+		}
+	}
+
+	@Override public void visit(NNotEQ a)
+	{
+		Object left = eval(a.getLeft());
+
+		Object right = eval(a.getRight());
+
+		if (a.getLeft().getType() == NTypeInt.INT)
+		{
+			operand.push((!((Integer) left).equals((Integer) right)));
+		}
+		else
+		{
+			operand.push((!((Double) left).equals((Double) right)));
+		}
+	}
+
+	@Override public void visit(NAnd a)
+	{
+		Object left = eval(a.getLeft());
+		if((Boolean) left)
+		{
+			ret(eval(a.getRight()));
+		}
+		else
+		{
+			ret(left);
 		}
 	}
 
@@ -341,7 +434,6 @@ public class ExpressionEvaluator implements INExprVisitor
 
 			// So will eval an if, and then a return, and then stop that evaling that if, and
 			// come back out to this loop, where then I need to ret whats on the eval stack
-			// but how ensure
 			if(marker.peek())
 			{
 				marker.pop();
