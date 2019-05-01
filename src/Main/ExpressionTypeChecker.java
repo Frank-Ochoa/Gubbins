@@ -155,16 +155,6 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 				}
 			}
 
-			/*if (nStmt instanceof NReturn)
-			{
-				// This boolean might be redundant
-				returnThere = true;
-
-				if (!(((NReturn) nStmt).getExpr().getType().equals(((NTypeFunction) functionType).getResult())))
-				{
-					returnTypeGood = false;
-				}
-			}*/
 
 			nStmts.add(nStmt);
 		}
