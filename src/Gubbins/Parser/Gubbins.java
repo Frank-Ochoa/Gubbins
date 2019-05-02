@@ -1155,9 +1155,11 @@ jjtree.closeNodeScope(jjtn000, true);
         }
       case TYPE_ARRAY:{
         jj_consume_token(TYPE_ARRAY);
-        t = Type();
+        jj_consume_token(LPAREN);
+        t = FunctionType();
+        jj_consume_token(RPAREN);
 jjtree.closeNodeScope(jjtn000, true);
-                                      jjtc000 = false;
+                                                               jjtc000 = false;
 {if ("" != null) return new TypeArray(t);}
         break;
         }
@@ -1641,7 +1643,7 @@ if (jjtc000) {
   static private boolean jj_3R_22()
  {
     if (jj_scan_token(TYPE_ARRAY)) return true;
-    if (jj_3R_19()) return true;
+    if (jj_scan_token(LPAREN)) return true;
     return false;
   }
 

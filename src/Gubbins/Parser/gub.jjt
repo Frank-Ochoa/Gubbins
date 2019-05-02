@@ -403,7 +403,7 @@ IASTType Type() :
 }
 {
      t = AtomicType()   {return t;}
-     | <TYPE_ARRAY> t = Type()      {return new TypeArray(t);}
+     | <TYPE_ARRAY>  <LPAREN> t = FunctionType() <RPAREN>    {return new TypeArray(t);}
 }
 
 

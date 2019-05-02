@@ -383,38 +383,57 @@ public class ExpressionEvaluator implements INExprVisitor
 
 	@Override public void visit(NFunction a)
 	{
-		valueEnviro.enterNewScope();
 
-		// what am I even returning here??? A function? but how?
-		// A closure would just be checking if its defined in scope, and if not then getting the
-		// value from outside the scope
+		// Need to Associate the function and a type enviro
 
-		// Oh wait, maybe just return the body of the function and tie that to whatever assigning to
-		// so that a function is called, just assign those values to the args and then eval the body
+		Map<String, Object> closureEnviro = new HashMap<>();
 
-		// So on a function call, I get the function, and then create NAssignment nodes based on the functions args
-		// but that needs to come after they have been declared? Or hmm
+		for (String name : a.getClosureIdents())
+		{
+			closureEnviro.put(name, valueEnviro.lookup(name));
+		}
 
-		// For function
-		// if return statement, discontinue the rest of the statements
+		// No associate the function and the above
+		Map<NFunction, Map<String, Object>> function = new HashMap<>();
 
-		// Oh jesus, I could get how many args there are, and then add Assignment nodes after those
+		function.put(a, closureEnviro);
 
+		ret(function);
 
-		ret(a);
-
-		valueEnviro.exitScope();
 	}
 
 	@Override public void visit(NFunctionCall a)
 	{
-		NFunction func = (NFunction) eval(a.getFunction());
+
+		Map<NFunction, Map<String, Object>> function = (Map<NFunction, Map<String, Object>>) eval(a.getFunction());
+
+		NFunction func = null;
+		Map<String, Object> closureEnviro = null;
+
+		for (Map.Entry<NFunction, Map<String, Object>> entry : function.entrySet())
+		{
+			func = entry.getKey();
+			closureEnviro = entry.getValue();
+		}
+
+		assert func != null;
+		assert closureEnviro != null;
 
 		NTypeFunction funcType = (NTypeFunction) func.getType();
 		NTypeRecord recType = (NTypeRecord) funcType.getArgs();
 
 		Iterator<NIdentifier> it1 = recType.getArgs().iterator();
 		Iterator<INExpr> it2 = a.getArgValues().iterator();
+
+		// Scope for the closure
+		valueEnviro.enterNewScope();
+
+		for(Map.Entry<String, Object> entry : closureEnviro.entrySet())
+		{
+			valueEnviro.declare(entry.getKey(), entry.getValue());
+		}
+
+		valueEnviro.enterNewScope();
 
 
 		while(it1.hasNext() && it2.hasNext())
@@ -442,6 +461,10 @@ public class ExpressionEvaluator implements INExprVisitor
 			}
 
 		}
+
+		valueEnviro.exitScope();
+
+		valueEnviro.exitScope();
 
 	}
 

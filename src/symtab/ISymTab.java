@@ -1,5 +1,7 @@
 package symtab;
 
+import java.util.List;
+
 public interface ISymTab<T>
 {
     void declare(String name, T type);
@@ -14,5 +16,5 @@ public interface ISymTab<T>
     
     void exitScope();
 
-    int numScopes();
+    List<String> getClosureIdents();
 }

@@ -117,6 +117,9 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		// Need to make sure this is a TypeFunction
 		IType functionType = t.typecheck(a.getTypeFunction());
 
+		// Get idents outside of scope of function
+		List<String> closureIdents = typeEnvironment.getClosureIdents();
+
 		// Enter new scope here?
 		typeEnvironment.enterNewScope();
 
@@ -144,6 +147,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 			// that each is of the return type found in the functionType
 
 			INStatement nStmt = statementTypeChecker.typecheck(stmt);
+
 			if (markers.peek())
 			{
 				markers.pop();
@@ -166,7 +170,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 			throw new TypeException("NO RETURN STATEMENT GIVEN");
 		}
 
-		ret(new NFunction(functionType, nStmts));
+		ret(new NFunction(functionType, nStmts, closureIdents));
 	}
 
 	@Override public void visit(FunctionCall a)

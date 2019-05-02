@@ -1097,12 +1097,12 @@ IASTType Type() :
                           jjtc000 = false;
                         }
 /*@egen*/   {return t;}
-     | <TYPE_ARRAY> t = Type()/*@bgen(jjtree)*/
-                                    {
-                                      jjtree.closeNodeScope(jjtn000, true);
-                                      jjtc000 = false;
-                                    }
-/*@egen*/      {return new TypeArray(t);}/*@bgen(jjtree)*/
+     | <TYPE_ARRAY>  <LPAREN> t = FunctionType() <RPAREN>/*@bgen(jjtree)*/
+                                                             {
+                                                               jjtree.closeNodeScope(jjtn000, true);
+                                                               jjtc000 = false;
+                                                             }
+/*@egen*/    {return new TypeArray(t);}/*@bgen(jjtree)*/
      } catch (Throwable jjte000) {
        if (jjtc000) {
          jjtree.clearNodeScope(jjtn000);

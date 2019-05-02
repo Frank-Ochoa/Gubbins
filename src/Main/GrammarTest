@@ -1,78 +1,21 @@
-arr int array := arr int (10);
+arr ( (int a) -> int ) functions := arr ( (int a) -> int ) (10);
 
-int testint := 4;
+int b := 20;
 
-array[0] := 9;
-array[1] := 2;
-array[2] := 4;
-array[3] := 2;
-array[4] := 44;
-array[5] := 22;
-array[6] := 5;
-array[7] := 8;
-array[8] := 3;
-array[9] := 1;
-
-int arrayLength := 10;
-int temp := 0;
-
-for i in range arrayLength
+for i in range 10
 {
-    for j in range arrayLength - i - 1
+    functions[i] := func (int a) -> int
     {
-        if(array[j] > array[j+1])
-        {
-            temp := array[j];
-            array[j] := array[j+1];
-            array[j+1] := temp;
-        }
-    }
+        return a + i + b;
+    };
 }
 
-print array;
+b := 500;
 
-(int a, int b) a := rec (int a := 10, int b := 12);
+(int a) -> int x1 := functions[0];
 
-int recTest := a.a;
-print recTest;
+(int a) -> int x2 := functions[1];
 
-(double a, int b) -> double dumbFunc := func (double a, int b) -> double
-{
+print x1(10);
 
-    if(a + b < 10)
-    {
-        if(a < 10)
-        {
-            return 1.0;
-        }
-    }
-
-   return a + b;
-};
-
-print dumbFunc(9.0, 8);
-
-(int a) -> int innerFunc := func (int a) -> int
-{
-    while(a < 20)
-    {
-        a := a + 1;
-    }
-
-    return a;
-};
-
-((int a) -> int function) -> int outerFunc := func ((int a) -> int function) -> int
-{
-    return function(0);
-};
-
-
-print outerFunc(innerFunc);
-
-int boolTest := 5;
-
-print boolTest != 10 | boolTest > 10;
-
-
-
+print x2(10);
