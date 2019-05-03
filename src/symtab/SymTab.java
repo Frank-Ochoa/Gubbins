@@ -53,11 +53,6 @@ public class SymTab<T> implements ISymTab<T>
 
 	@Override public T lookupNearest(String name)
 	{
-		for(Map.Entry<String, T> entry : scopes.get(0).entrySet())
-		{
-			System.out.println(entry.getKey() + " :: " + entry.getValue());
-		}
-
 		T t = scopes.get(0).get(name);
 		return t;
 	}

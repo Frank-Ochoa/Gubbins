@@ -1,18 +1,21 @@
-int test := 50000;
+int foo := 50000;
+int bar := 5;
 
+( int foo, int bar, (int a) -> int fred ) object := rec
+(
 
-( int test, (int a) -> int function ) object := rec (
+    int foo := 600,
+    int bar := 6,
 
-int test := 500,
+    (int a) -> int fred := func (int a) -> int
+    {
+        return foo + a + bar;
+    }
 
-(int a) -> int function := func (int a) -> int
-{
-    return test + a;
-}
 
 );
 
-(int a) -> int function := object.function;
+(int a) -> int fred := object.fred;
 
 
-print function(0);
+print fred(0);

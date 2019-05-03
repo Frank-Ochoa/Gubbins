@@ -347,6 +347,7 @@ public class StatementTypeChecker implements IASTStatementVisitor
 		ret(new NReturn(expr));
 	}
 
+
 	private INExpr promote(INExpr node)
 	{
 		if (node.getType() == NTypeInt.INT)
