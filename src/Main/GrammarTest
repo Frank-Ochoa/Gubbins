@@ -1,21 +1,18 @@
-arr ( (int a) -> int ) functions := arr ( (int a) -> int ) (10);
+int test := 50000;
 
-int b := 20;
 
-for i in range 10
+( int test, (int a) -> int function ) object := rec (
+
+int test := 500,
+
+(int a) -> int function := func (int a) -> int
 {
-    functions[i] := func (int a) -> int
-    {
-        return a + i + b;
-    };
+    return test + a;
 }
 
-b := 500;
+);
 
-(int a) -> int x1 := functions[0];
+(int a) -> int function := object.function;
 
-(int a) -> int x2 := functions[1];
 
-print x1(10);
-
-print x2(10);
+print function(0);

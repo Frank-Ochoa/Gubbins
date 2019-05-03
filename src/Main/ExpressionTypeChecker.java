@@ -6,7 +6,6 @@ import symtab.ISymTab;
 import types.TypeException;
 import types.UndeclaredIdentifer;
 
-import java.lang.reflect.Type;
 import java.util.*;
 
 public class ExpressionTypeChecker implements IASTExpressionVisitor

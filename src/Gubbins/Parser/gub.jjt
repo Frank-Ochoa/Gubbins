@@ -39,6 +39,7 @@ TOKEN : /* RESERVED WORDS*/
     |   <ARROW: "->">
     |   <REC:   "rec">
     |   <RETURN: "return">
+    |   <NEW: "new">
 }
 
 TOKEN : /* TYPES */
@@ -47,6 +48,7 @@ TOKEN : /* TYPES */
     |   <TYPE_DOUBLE: "double">
     |   <TYPE_BOOLEAN: "bool">
     |   <TYPE_ARRAY : "arr" >
+    |   <TYPE_OBJECT: "object">
 }
 
 TOKEN : /* IDENTIFIERS */ //a token is one unit of information
@@ -500,8 +502,6 @@ Function Function() :
 
     {return new Function(def, stmts);}
 }
-// Could do AtomicType() <IDENT>, then return a hashmap of them, so a record would be hashmap from ident -> type
-
 
 
 
