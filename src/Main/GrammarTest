@@ -16,6 +16,4 @@ int bar := 5;
 
 );
 
-(int a) -> int fred := object.fred;
-
-print fred(0);
+print object.fred(0);

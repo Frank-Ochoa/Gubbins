@@ -48,7 +48,6 @@ TOKEN : /* TYPES */
     |   <TYPE_DOUBLE: "double">
     |   <TYPE_BOOLEAN: "bool">
     |   <TYPE_ARRAY : "arr" >
-    |   <TYPE_OBJECT: "object">
 }
 
 TOKEN : /* IDENTIFIERS */ //a token is one unit of information
@@ -274,28 +273,16 @@ IASTExpr MultiplicativeExpression() :
     IASTExpr result, b;
 }
 {
-    result = RecordAccessExpression()
+    result = ArrayIndexExpression()
     (
-           <MULT> b = RecordAccessExpression() {result = new Mult(result, b);}
-        |  <DIV>  b = RecordAccessExpression() {result = new Div(result, b); }
-        |  <MOD> b = RecordAccessExpression() {result = new Mod(result, b);}
+           <MULT> b = ArrayIndexExpression() {result = new Mult(result, b);}
+        |  <DIV>  b = ArrayIndexExpression() {result = new Div(result, b); }
+        |  <MOD> b = ArrayIndexExpression() {result = new Mod(result, b);}
 
     )*
     { return result; }
 }
 
-IASTExpr RecordAccessExpression () :
-{
-    IASTExpr result;
-    Token index;
-}
-{
-    result = ArrayIndexExpression()
-     (
-        <DOT> index = <IDENTIFIER> {result = new RecordAccess(result, index.image);}
-     )?
-    { return result;}
-}
 
 IASTExpr ArrayIndexExpression() :
 {
@@ -329,13 +316,26 @@ IASTExpr FunctionCallExpresion() :
     List<IASTExpr> argValues = new LinkedList<IASTExpr>();
 }
 {
-    result = AtomicExpression()
+    result = RecordAccessExpression()
     (
        <LPAREN> argVal = Expression() {argValues.add(argVal);} (<COMMA> argVal = Expression() {argValues.add(argVal);})* <RPAREN>
        {return new FunctionCall(result, argValues);}
     )?
 
     {return result;}
+}
+
+IASTExpr RecordAccessExpression () :
+{
+    IASTExpr result;
+    Token index;
+}
+{
+    result = AtomicExpression()
+     (
+        <DOT> index = <IDENTIFIER> {result = new RecordAccess(result, index.image);}
+     )?
+    { return result;}
 }
 
 IASTExpr AtomicExpression() :

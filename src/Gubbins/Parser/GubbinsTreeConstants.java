@@ -16,9 +16,9 @@ public interface GubbinsTreeConstants
   public int JJTCONDITIONALEXPRESSION = 10;
   public int JJTADDITIVEEXPRESSION = 11;
   public int JJTMULTIPLICATIVEEXPRESSION = 12;
-  public int JJTRECORDACCESSEXPRESSION = 13;
-  public int JJTARRAYINDEXEXPRESSION = 14;
-  public int JJTFUNCTIONCALLEXPRESION = 15;
+  public int JJTARRAYINDEXEXPRESSION = 13;
+  public int JJTFUNCTIONCALLEXPRESION = 14;
+  public int JJTRECORDACCESSEXPRESSION = 15;
   public int JJTATOMICEXPRESSION = 16;
   public int JJTASSIGNMENT = 17;
   public int JJTFUNCTIONTYPE = 18;
@@ -45,9 +45,9 @@ public interface GubbinsTreeConstants
     "ConditionalExpression",
     "AdditiveExpression",
     "MultiplicativeExpression",
-    "RecordAccessExpression",
     "ArrayIndexExpression",
     "FunctionCallExpresion",
+    "RecordAccessExpression",
     "AtomicExpression",
     "Assignment",
     "FunctionType",
@@ -60,4 +60,4 @@ public interface GubbinsTreeConstants
     "Function",
   };
 }
-/* JavaCC - OriginalChecksum=9ad7f8faab3ee62c5703efc348a100fb (do not edit this line) */
+/* JavaCC - OriginalChecksum=426f8c881e8829933e85630e9baffdd4 (do not edit this line) */

@@ -43,6 +43,7 @@ TOKEN : /* RESERVED WORDS*/
     |   <ARROW: "->">
     |   <REC:   "rec">
     |   <RETURN: "return">
+    |   <NEW: "new">
 }
 
 TOKEN : /* TYPES */
@@ -709,11 +710,11 @@ IASTExpr MultiplicativeExpression() :
 {/*@bgen(jjtree) MultiplicativeExpression */
     try {
 /*@egen*/
-    result = RecordAccessExpression()
+    result = ArrayIndexExpression()
     (
-           <MULT> b = RecordAccessExpression() {result = new Mult(result, b);}
-        |  <DIV>  b = RecordAccessExpression() {result = new Div(result, b); }
-        |  <MOD> b = RecordAccessExpression() {result = new Mod(result, b);}
+           <MULT> b = ArrayIndexExpression() {result = new Mult(result, b);}
+        |  <DIV>  b = ArrayIndexExpression() {result = new Div(result, b); }
+        |  <MOD> b = ArrayIndexExpression() {result = new Mod(result, b);}
 
     )*/*@bgen(jjtree)*/
     {
@@ -744,49 +745,6 @@ IASTExpr MultiplicativeExpression() :
 /*@egen*/
 }
 
-IASTExpr RecordAccessExpression () :
-{/*@bgen(jjtree) RecordAccessExpression */
-    SimpleNode jjtn000 = new SimpleNode(JJTRECORDACCESSEXPRESSION);
-    boolean jjtc000 = true;
-    jjtree.openNodeScope(jjtn000);
-/*@egen*/
-    IASTExpr result;
-    Token index;
-}
-{/*@bgen(jjtree) RecordAccessExpression */
-    try {
-/*@egen*/
-    result = ArrayIndexExpression()
-     (
-        <DOT> index = <IDENTIFIER> {result = new RecordAccess(result, index.image);}
-     )?/*@bgen(jjtree)*/
-    {
-      jjtree.closeNodeScope(jjtn000, true);
-      jjtc000 = false;
-    }
-/*@egen*/
-    { return result;}/*@bgen(jjtree)*/
-    } catch (Throwable jjte000) {
-      if (jjtc000) {
-        jjtree.clearNodeScope(jjtn000);
-        jjtc000 = false;
-      } else {
-        jjtree.popNode();
-      }
-      if (jjte000 instanceof RuntimeException) {
-        throw (RuntimeException)jjte000;
-      }
-      if (jjte000 instanceof ParseException) {
-        throw (ParseException)jjte000;
-      }
-      throw (Error)jjte000;
-    } finally {
-      if (jjtc000) {
-        jjtree.closeNodeScope(jjtn000, true);
-      }
-    }
-/*@egen*/
-}
 
 IASTExpr ArrayIndexExpression() :
 {/*@bgen(jjtree) ArrayIndexExpression */
@@ -857,7 +815,7 @@ IASTExpr FunctionCallExpresion() :
 {/*@bgen(jjtree) FunctionCallExpresion */
     try {
 /*@egen*/
-    result = AtomicExpression()
+    result = RecordAccessExpression()
     (
        <LPAREN> argVal = Expression() {argValues.add(argVal);} (<COMMA> argVal = Expression() {argValues.add(argVal);})* <RPAREN>
        {return new FunctionCall(result, argValues);}
@@ -869,6 +827,50 @@ IASTExpr FunctionCallExpresion() :
 /*@egen*/
 
     {return result;}/*@bgen(jjtree)*/
+    } catch (Throwable jjte000) {
+      if (jjtc000) {
+        jjtree.clearNodeScope(jjtn000);
+        jjtc000 = false;
+      } else {
+        jjtree.popNode();
+      }
+      if (jjte000 instanceof RuntimeException) {
+        throw (RuntimeException)jjte000;
+      }
+      if (jjte000 instanceof ParseException) {
+        throw (ParseException)jjte000;
+      }
+      throw (Error)jjte000;
+    } finally {
+      if (jjtc000) {
+        jjtree.closeNodeScope(jjtn000, true);
+      }
+    }
+/*@egen*/
+}
+
+IASTExpr RecordAccessExpression () :
+{/*@bgen(jjtree) RecordAccessExpression */
+    SimpleNode jjtn000 = new SimpleNode(JJTRECORDACCESSEXPRESSION);
+    boolean jjtc000 = true;
+    jjtree.openNodeScope(jjtn000);
+/*@egen*/
+    IASTExpr result;
+    Token index;
+}
+{/*@bgen(jjtree) RecordAccessExpression */
+    try {
+/*@egen*/
+    result = AtomicExpression()
+     (
+        <DOT> index = <IDENTIFIER> {result = new RecordAccess(result, index.image);}
+     )?/*@bgen(jjtree)*/
+    {
+      jjtree.closeNodeScope(jjtn000, true);
+      jjtc000 = false;
+    }
+/*@egen*/
+    { return result;}/*@bgen(jjtree)*/
     } catch (Throwable jjte000) {
       if (jjtc000) {
         jjtree.clearNodeScope(jjtn000);
