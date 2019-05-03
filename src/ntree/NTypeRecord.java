@@ -19,6 +19,7 @@ public class NTypeRecord implements IType
 		return args;
 	}
 
+
 	@Override public void arrayCheckSize(int size)
 	{
 		// This is going to check the size of the actual list, against the list of other records

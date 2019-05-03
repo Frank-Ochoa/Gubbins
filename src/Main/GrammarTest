@@ -9,13 +9,13 @@ int bar := 5;
 
     (int a) -> int fred := func (int a) -> int
     {
-        return foo + a + bar;
+        int foo := 0;
+        return this.foo + a + bar;
     }
 
 
 );
 
 (int a) -> int fred := object.fred;
-
 
 print fred(0);

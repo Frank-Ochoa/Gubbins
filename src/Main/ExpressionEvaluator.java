@@ -76,9 +76,13 @@ public class ExpressionEvaluator implements INExprVisitor
 		{
 			return 0.0;
 		}
-		else
+		else if(type == NTypeBoolean.BOOLEAN)
 		{
 			return false;
+		}
+		else
+		{
+			return null;
 		}
 	}
 
@@ -346,45 +350,60 @@ public class ExpressionEvaluator implements INExprVisitor
 	{
 		valueEnviro.enterNewScope();
 		// Possibly hashmap of values? Where a record index expression then does a look up on that hashmap
-		HashMap<String, Object> recordMap = new HashMap<>();
 		StatementEvaluator sEval = new StatementEvaluator(valueEnviro);
 
 		for(INStatement stmt : a.getArgs())
 		{
 			sEval.eval(stmt);
-			if (stmt instanceof NDeclaration)
+			if (stmt instanceof NDeclareAssign)
 			{
-				String name = ((NDeclaration) stmt).getRhs().getName();
-				recordMap.put(name, valueEnviro.lookup(name));
-			}
-			else if (stmt instanceof NDeclareAssign)
-			{
-				String name = ((NDeclareAssign) stmt).getIdentifier().getName();
-				recordMap.put(name, valueEnviro.lookup(name));
+
+				if (((NDeclareAssign) stmt).getType() instanceof NTypeFunction)
+				{
+					Map<NFunction, Map<String, Object>> function = (Map<NFunction, Map<String, Object>>) eval(((NDeclareAssign) stmt).getIdentifier());
+					for(Map.Entry<NFunction, Map<String, Object>> entry : function.entrySet())
+					{
+						entry.getValue().put("this", a);
+					}
+				}
+
 			}
 			else if(stmt instanceof NAssignment)
 			{
-				String name = ((NAssignment) stmt).getLhs().getName();
-				recordMap.put(name, valueEnviro.lookup(name));
+				if (((NAssignment) stmt).getLhs().getType() instanceof NTypeFunction)
+				{
+					Map<NFunction, Map<String, Object>> function = (Map<NFunction, Map<String, Object>>) eval(((NAssignment) stmt).getLhs());
+					for(Map.Entry<NFunction, Map<String, Object>> entry : function.entrySet())
+					{
+						entry.getValue().put("this", a);
+					}
+				}
 			}
 		}
 
-		valueEnviro.exitScope();
+		ret(valueEnviro.getCurrentScope());
 
-		ret(recordMap);
+		valueEnviro.exitScope();
 	}
 
 	@Override public void visit(NRecordAccess a)
 	{
+		Map<String, Object> map;
 		// Here I need eval the left to get the hashmap
-		HashMap<String, Object> map = (HashMap <String,Object>) eval(a.getRec());
+		if (eval(a.getRec()) instanceof NRecord)
+		{
+			map = (Map<String, Object>) eval((INExpr) eval(a.getRec()));
+		}
+		else
+		{
+			map = (HashMap <String,Object>) eval(a.getRec());
+		}
+		//Map<String, Object> map = (HashMap <String,Object>) eval(a.getRec());
 		ret(map.get(a.getIndex()));
 	}
 
 	@Override public void visit(NFunction a)
 	{
-
-		// Need to Associate the function and a type enviro
 
 		Map<String, Object> closureEnviro = new HashMap<>();
 
@@ -393,7 +412,6 @@ public class ExpressionEvaluator implements INExprVisitor
 			closureEnviro.put(name, valueEnviro.lookup(name));
 		}
 
-		// No associate the function and the above
 		Map<NFunction, Map<String, Object>> function = new HashMap<>();
 
 		function.put(a, closureEnviro);
@@ -404,7 +422,6 @@ public class ExpressionEvaluator implements INExprVisitor
 
 	@Override public void visit(NFunctionCall a)
 	{
-
 		Map<NFunction, Map<String, Object>> function = (Map<NFunction, Map<String, Object>>) eval(a.getFunction());
 
 		NFunction func = null;
@@ -426,12 +443,7 @@ public class ExpressionEvaluator implements INExprVisitor
 		Iterator<INExpr> it2 = a.getArgValues().iterator();
 
 		// Scope for the closure
-		valueEnviro.enterNewScope();
-
-		for(Map.Entry<String, Object> entry : closureEnviro.entrySet())
-		{
-			valueEnviro.declare(entry.getKey(), entry.getValue());
-		}
+		valueEnviro.enterNewScope(closureEnviro);
 
 		valueEnviro.enterNewScope();
 

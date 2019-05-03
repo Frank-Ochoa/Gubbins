@@ -51,6 +51,18 @@ public class SymTab<T> implements ISymTab<T>
 		scopes.addFirst(new HashMap<>());
 	}
 
+	@Override public void enterNewScope(Map<String, T> enviro)
+	{
+		scopes.addFirst(enviro);
+	}
+
+	@Override public Map<String, T> getCurrentScope()
+	{
+		return scopes.get(0);
+	}
+
+	// Enter new scope with an argument of a scope
+
 	@Override public T lookupNearest(String name)
 	{
 		T t = scopes.get(0).get(name);

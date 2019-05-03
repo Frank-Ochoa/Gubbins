@@ -12,6 +12,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 {
 	private Stack<INExpr> estack;
 	private ISymTab<IType> typeEnvironment;
+	private static Stack<NTypeRecord> records = new Stack<>();
 
 	ExpressionTypeChecker(ISymTab<IType> typeEnvironment)
 	{
@@ -122,6 +123,12 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		// Enter new scope here?
 		typeEnvironment.enterNewScope();
 
+		// Fudging to test, does not contain foo, need to pass this back
+		if (!records.empty())
+		{
+			typeEnvironment.declare("this", records.peek());
+		}
+
 		if (functionType instanceof NTypeFunction)
 		{
 			NTypeRecord typeRec = (NTypeRecord) ((NTypeFunction) functionType).getArgs();
@@ -215,11 +222,13 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 	@Override public void visit(Record a)
 	{
+		records.push(new NTypeRecord(new LinkedList<>()));
+
 		// What to type check about a record?
 		List<INStatement> nElements = new LinkedList<>();
 		List<NIdentifier> nIdentifiers = new LinkedList<>();
 
-		// Enter new scope here?
+		// What I want is in this scope, or rather what I want is this scope
 		typeEnvironment.enterNewScope();
 		StatementTypeChecker statementTypeChecker = new StatementTypeChecker(typeEnvironment);
 
@@ -231,11 +240,15 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 			// Compute the type of the record
 			if (nElement instanceof NDeclaration)
 			{
-				nIdentifiers.add(((NDeclaration) nElement).getRhs());
+				NIdentifier ident = ((NDeclaration) nElement).getRhs();
+				nIdentifiers.add(ident);
+				records.peek().getArgs().add(ident);
 			}
 			else if (nElement instanceof NDeclareAssign)
 			{
-				nIdentifiers.add(((NDeclareAssign) nElement).getIdentifier());
+				NIdentifier ident = ((NDeclareAssign) nElement).getIdentifier();
+				nIdentifiers.add(ident);
+				records.peek().getArgs().add(ident);
 			}
 
 			nElements.add(nElement);
@@ -244,6 +257,8 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		typeEnvironment.exitScope();
 
 		ret(new NRecord(new NTypeRecord(nIdentifiers), nElements));
+
+		records.pop();
 	}
 
 	@Override public void visit(RecordAccess a)
