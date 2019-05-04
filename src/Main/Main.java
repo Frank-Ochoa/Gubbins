@@ -13,7 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.util.*;
 
-public class CSC325
+public class Main
 {
 
 	/**
