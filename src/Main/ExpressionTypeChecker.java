@@ -10,9 +10,9 @@ import java.util.*;
 
 public class ExpressionTypeChecker implements IASTExpressionVisitor
 {
+	private static Stack<NTypeRecord> records = new Stack<>();
 	private Stack<INExpr> estack;
 	private ISymTab<IType> typeEnvironment;
-	private static Stack<NTypeRecord> records = new Stack<>();
 
 	ExpressionTypeChecker(ISymTab<IType> typeEnvironment)
 	{
@@ -117,9 +117,6 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		// Need to make sure this is a TypeFunction
 		IType functionType = t.typecheck(a.getTypeFunction());
 
-		// Get idents outside of scope of function
-		List<String> closureIdents = typeEnvironment.getClosureIdents();
-
 		// Enter new scope here?
 		typeEnvironment.enterNewScope();
 
@@ -165,9 +162,11 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 				}
 			}
 
-
 			nStmts.add(nStmt);
 		}
+
+		// Get idents outside of scope of function
+		List<String> closureIdents = typeEnvironment.getClosureIdents(typeEnvironment.getCurrentScope());
 
 		typeEnvironment.exitScope();
 
@@ -226,7 +225,6 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 		// What to type check about a record?
 		List<INStatement> nElements = new LinkedList<>();
-		List<NIdentifier> nIdentifiers = new LinkedList<>();
 
 		// What I want is in this scope, or rather what I want is this scope
 		typeEnvironment.enterNewScope();
@@ -241,13 +239,11 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 			if (nElement instanceof NDeclaration)
 			{
 				NIdentifier ident = ((NDeclaration) nElement).getRhs();
-				nIdentifiers.add(ident);
 				records.peek().getArgs().add(ident);
 			}
 			else if (nElement instanceof NDeclareAssign)
 			{
 				NIdentifier ident = ((NDeclareAssign) nElement).getIdentifier();
-				nIdentifiers.add(ident);
 				records.peek().getArgs().add(ident);
 			}
 
@@ -256,9 +252,8 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 		typeEnvironment.exitScope();
 
-		ret(new NRecord(new NTypeRecord(nIdentifiers), nElements));
+		ret(new NRecord(records.pop(), nElements));
 
-		records.pop();
 	}
 
 	@Override public void visit(RecordAccess a)
@@ -401,7 +396,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		INExpr l = tcheck(operator.getLeft());
 		INExpr r = tcheck(operator.getRight());
 
-		if(!(operator instanceof Or) && !(operator instanceof And))
+		if (!(operator instanceof Or) && !(operator instanceof And))
 		{
 			checkIsNumeric(l);
 			checkIsNumeric(r);

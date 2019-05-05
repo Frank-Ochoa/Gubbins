@@ -9,10 +9,10 @@ int bar := 5;
 
     (int a) -> int fred := func (int a) -> int
     {
-        int foo := 0;
-        return this.foo + a + bar;
-    }
+        int bar := 0;
 
+        return foo + a + this.bar;
+    }
 
 );
 

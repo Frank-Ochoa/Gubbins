@@ -74,18 +74,23 @@ public class SymTab<T> implements ISymTab<T>
 		scopes.removeFirst();
 	}
 
-	@Override public List<String> getClosureIdents()
+	@Override public List<String> getClosureIdents(Map<String, T> functionScope)
 	{
 		// Might want things from all different scopes
 		List<String> idents = new LinkedList<>();
 
-		// Maybe all scopes but function scope
+		// Maybe all scopes but function scope, compute difference
 
 		for(Map<String, T> scope : scopes)
 		{
 			for (Map.Entry<String, T> entry : scope.entrySet())
 			{
-				idents.add(entry.getKey());
+				String key = entry.getKey();
+
+				if (!functionScope.containsKey(key))
+				{
+					idents.add(key);
+				}
 			}
 		}
 

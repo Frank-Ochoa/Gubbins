@@ -21,5 +21,5 @@ public interface ISymTab<T>
     
     void exitScope();
 
-    List<String> getClosureIdents();
+    List<String> getClosureIdents(Map<String, T> functionScope);
 }
