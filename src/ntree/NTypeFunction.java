@@ -1,5 +1,7 @@
 package ntree;
 
+import types.TypeException;
+
 public class NTypeFunction implements IType
 {
 	private IType args;
@@ -24,6 +26,10 @@ public class NTypeFunction implements IType
 	@Override public void arrayCheckSize(int size)
 	{
 		// Because could have an array of functions??? lol
+		if(size != 0)
+		{
+			throw new TypeException("SIZES DO NOT MATCH");
+		}
 	}
 
 	@Override public boolean equals(Object obj)
