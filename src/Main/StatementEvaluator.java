@@ -37,7 +37,6 @@ public class StatementEvaluator implements INStatementVisitor
 			// If a return was executed, stop evaling further statements
 			if (markerS.peek())
 			{
-				System.out.println("Found a return");
 				break;
 			}
 		}
@@ -142,7 +141,7 @@ public class StatementEvaluator implements INStatementVisitor
 
 		eval(a.getInitializers());
 
-		while ((Boolean) exprEval.eval(a.getCondt()))
+		while ((Boolean) exprEval.eval(a.getCondt()) && !markerS.peek())
 		{
 			evalEnviroment.enterNewScope();
 			eval(a.getBody());

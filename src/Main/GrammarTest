@@ -9,9 +9,15 @@ int bar := 5;
 
     (int a) -> int fred := func (int a) -> int
     {
-        int bar := 0;
+        for i in range 20
+        {
+            if(i = 9)
+            {
+                return foo;
+            }
+        }
 
-        return foo + a + this.bar;
+        return 0;
     }
 
 );

@@ -463,8 +463,6 @@ public class ExpressionEvaluator implements INExprVisitor
 		{
 			sEval.eval(stmt);
 
-			// So will eval an if, and then a return, and then stop that evaling that if, and
-			// come back out to this loop, where then I need to ret whats on the eval stack
 			if(marker.peek())
 			{
 				marker.pop();
