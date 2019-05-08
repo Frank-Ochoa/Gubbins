@@ -84,13 +84,13 @@ public class TypeTypeChecker implements IASTTypeVisitor, ITypeVisitor
 
 	@Override public void visit(TypeRecord a)
 	{
-		List<NIdentifier> args = new LinkedList<>();
+		Map<String, IType> args = new LinkedHashMap<>();
 		for(Map.Entry<Identifier, IASTType> entry : a.getArgs().entrySet())
 		{
 			String name = entry.getKey().getName();
 			IType type = typecheck(entry.getValue());
 
-			args.add(new NIdentifier(name, type));
+			args.put(name, type);
 		}
 
 		ret(new NTypeRecord(args));

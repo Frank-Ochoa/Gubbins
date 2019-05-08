@@ -439,7 +439,7 @@ public class ExpressionEvaluator implements INExprVisitor
 		NTypeFunction funcType = (NTypeFunction) func.getType();
 		NTypeRecord recType = (NTypeRecord) funcType.getArgs();
 
-		Iterator<NIdentifier> it1 = recType.getArgs().iterator();
+		Iterator<Map.Entry<String, IType>> it1 = recType.getArgs().entrySet().iterator();
 		Iterator<INExpr> it2 = a.getArgValues().iterator();
 
 		// Scope for the closure
@@ -450,9 +450,9 @@ public class ExpressionEvaluator implements INExprVisitor
 
 		while(it1.hasNext() && it2.hasNext())
 		{
-			String name = it1.next().getName();
+			Map.Entry<String, IType> rec = it1.next();
 			Object value = eval(it2.next());
-			valueEnviro.declare(name, value);
+			valueEnviro.declare(rec.getKey(), value);
 		}
 
 		StatementEvaluator sEval = new StatementEvaluator(valueEnviro);

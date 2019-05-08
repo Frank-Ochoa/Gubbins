@@ -129,9 +129,9 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		if (functionType instanceof NTypeFunction)
 		{
 			NTypeRecord typeRec = (NTypeRecord) ((NTypeFunction) functionType).getArgs();
-			for (NIdentifier ident : typeRec.getArgs())
+			for (Map.Entry<String, IType> ident : typeRec.getArgs().entrySet())
 			{
-				typeEnvironment.declare(ident.getName(), ident.getType());
+				typeEnvironment.declare(ident.getKey(), ident.getValue());
 			}
 		}
 		else
@@ -198,15 +198,15 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 		}
 
 		List<INExpr> argValues = new LinkedList<>();
-		Iterator<NIdentifier> it = recType.getArgs().iterator();
+		Iterator<Map.Entry<String, IType>> it = recType.getArgs().entrySet().iterator();
 
 		for (IASTExpr expr : a.getArgValues())
 		{
 			INExpr argValue = typecheck(expr);
-			NIdentifier argParam = it.next();
+			Map.Entry<String, IType> argParam = it.next();
 
 			// Pretty sure this check is redundant because assign will catch but this will catch sooner
-			if (!argValue.getType().equals(argParam.getType()))
+			if (!argValue.getType().equals(argParam.getValue()))
 			{
 				throw new TypeException("FUNCTION CALL ARG TYPE INCORRECT");
 			}
@@ -221,7 +221,7 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 	@Override public void visit(Record a)
 	{
-		records.push(new NTypeRecord(new LinkedList<>()));
+		records.push(new NTypeRecord(new LinkedHashMap<>()));
 
 		// What to type check about a record?
 		List<INStatement> nElements = new LinkedList<>();
@@ -239,12 +239,12 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 			if (nElement instanceof NDeclaration)
 			{
 				NIdentifier ident = ((NDeclaration) nElement).getRhs();
-				records.peek().getArgs().add(ident);
+				records.peek().getArgs().put(ident.getName(), ident.getType());
 			}
 			else if (nElement instanceof NDeclareAssign)
 			{
 				NIdentifier ident = ((NDeclareAssign) nElement).getIdentifier();
-				records.peek().getArgs().add(ident);
+				records.peek().getArgs().put(ident.getName(), ident.getType());
 			}
 
 			nElements.add(nElement);
@@ -266,15 +266,17 @@ public class ExpressionTypeChecker implements IASTExpressionVisitor
 
 		if (recType instanceof NTypeRecord)
 		{
-			// Need to check the args in the record if their name matches the index
-			for (NIdentifier ident : ((NTypeRecord) recType).getArgs())
+			// This would better be refactored as lookup in a HashMap
+			/*for (Map.Entry<String, IType> ident : ((NTypeRecord) recType).getArgs().entrySet())
 			{
-				if (ident.getName().equals(index))
+				if (ident.getKey().equals(index))
 				{
-					recAT = ident.getType();
+					recAT = ident.getValue();
 					break;
 				}
-			}
+			}*/
+
+			recAT = ((NTypeRecord) recType).getArgs().get(index);
 		}
 		else
 		{
