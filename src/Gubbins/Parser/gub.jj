@@ -43,7 +43,7 @@ TOKEN : /* RESERVED WORDS*/
     |   <ARROW: "->">
     |   <REC:   "rec">
     |   <RETURN: "return">
-    |   <NEW: "new">
+    |   <ARROWEND: "<-">
 }
 
 TOKEN : /* TYPES */
@@ -1051,7 +1051,7 @@ IASTType FunctionType() :
 /*@egen*/
     result = Type()
     (
-        <ARROW> t = Type() {return new TypeFunction(result, t);}
+        <ARROW> t = FunctionType() <ARROWEND>  {return new TypeFunction(result, t);}
     )*/*@bgen(jjtree)*/
     {
       jjtree.closeNodeScope(jjtn000, true);

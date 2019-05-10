@@ -37,7 +37,7 @@ public interface GubbinsConstants {
   /** RegularExpression Id. */
   int RETURN = 17;
   /** RegularExpression Id. */
-  int NEW = 18;
+  int ARROWEND = 18;
   /** RegularExpression Id. */
   int TYPE_INT = 19;
   /** RegularExpression Id. */
@@ -126,7 +126,7 @@ public interface GubbinsConstants {
     "\"->\"",
     "\"rec\"",
     "\"return\"",
-    "\"new\"",
+    "\"<-\"",
     "\"int\"",
     "\"double\"",
     "\"bool\"",
