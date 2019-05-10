@@ -1,12 +1,12 @@
 int foo := 50000;
 int bar := 5;
 
-( int foo, int bar, (int a) -> int <- fred ) object := rec
+( int foo, int bar, (int a) -> (int) fred ) object := rec
 (
     int foo := 600,
     int bar := 6,
 
-    (int a) -> int <- fred := func (int a) -> int <-
+    (int a) -> (int) fred := func (int a) -> (int)
     {
         for i in range 20
         {
@@ -25,34 +25,18 @@ int bar := 5;
 print object.fred(0);
 
 
-(int a) -> int <- blop := func (int a) -> int <-
+(int a) -> (int) blop := func (int a) -> (int)
 {
     return a;
 };
 
 
-( (int a) -> int <- blop ) -> int <- blargh := func ( (int a) -> int <- blop ) -> int <-
+( (int a) -> (int) blop ) -> (int)  blargh := func ( (int a) -> (int) blop ) -> (int)
 {
-
 
     return blop(5);
 
 };
 
 print blargh(blop);
-
-(int a) -> (int x) -> int <- <- wow := func (int a) -> (int x) -> int <- <-
-{
-
-    return func (int x) -> int <-
-    {
-        return x;
-    };
-
-};
-
-
-(int x) -> int <- testing := wow(0);
-
-print testing (100);
 

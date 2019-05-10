@@ -1051,7 +1051,7 @@ IASTType FunctionType() :
 /*@egen*/
     result = Type()
     (
-        <ARROW> t = FunctionType() <ARROWEND>  {return new TypeFunction(result, t);}
+        <ARROW> <LPAREN> t = FunctionType() <RPAREN>  {return new TypeFunction(result, t);}
     )*/*@bgen(jjtree)*/
     {
       jjtree.closeNodeScope(jjtn000, true);

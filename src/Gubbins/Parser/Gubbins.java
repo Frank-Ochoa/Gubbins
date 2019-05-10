@@ -1109,8 +1109,9 @@ if (jjtc000) {
           break label_10;
         }
         jj_consume_token(ARROW);
+        jj_consume_token(LPAREN);
         t = FunctionType();
-        jj_consume_token(ARROWEND);
+        jj_consume_token(RPAREN);
 {if ("" != null) return new TypeFunction(result, t);}
       }
 jjtree.closeNodeScope(jjtn000, true);

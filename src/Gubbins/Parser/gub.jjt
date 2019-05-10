@@ -39,7 +39,6 @@ TOKEN : /* RESERVED WORDS*/
     |   <ARROW: "->">
     |   <REC:   "rec">
     |   <RETURN: "return">
-    |   <ARROWEND: "<-">
 }
 
 TOKEN : /* TYPES */
@@ -393,7 +392,7 @@ IASTType FunctionType() :
 {
     result = Type()
     (
-        <ARROW> t = FunctionType() <ARROWEND>  {return new TypeFunction(result, t);}
+        <ARROW> <LPAREN> t = FunctionType() <RPAREN>  {return new TypeFunction(result, t);}
     )*
 
     {return result;}
